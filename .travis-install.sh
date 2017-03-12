@@ -7,13 +7,13 @@ sudo apt-get install openjdk-7-jdk
 
 # Build and install rumprun toolchain from source
 RUMPRUN_PLATFORM=${RUMPRUN_PLATFORM:-hw}
-RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE:-x86_64-rumprun-netbsd}
+RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE:-x86_64-rumprun-linux}
 
 git clone -q https://github.com/rumpkernel/rumprun /tmp/rumprun
 (
 	cd /tmp/rumprun
 	git submodule update --init
-	./build-rr.sh -d /usr/local -o ./obj -qq ${RUMPRUN_PLATFORM} build
+	./build-rr.sh -d /usr/local -l linux -o ./obj -qq ${RUMPRUN_PLATFORM} build
 	sudo ./build-rr.sh -d /usr/local -o ./obj ${RUMPRUN_PLATFORM} install
 )
 echo RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE} >config.mk
