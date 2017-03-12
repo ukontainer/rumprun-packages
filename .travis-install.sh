@@ -9,7 +9,7 @@ sudo apt-get install openjdk-7-jdk
 RUMPRUN_PLATFORM=${RUMPRUN_PLATFORM:-hw}
 RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE:-x86_64-rumprun-linux}
 
-git clone -q https://github.com/rumpkernel/rumprun /tmp/rumprun
+git clone -q https://github.com/libos-nuse/rumprun /tmp/rumprun
 (
 	cd /tmp/rumprun
 	git submodule update --init
