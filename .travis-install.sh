@@ -13,7 +13,7 @@ git clone -q https://github.com/libos-nuse/rumprun /tmp/rumprun
 (
 	cd /tmp/rumprun
 	git submodule update --init
-	./build-rr.sh -d /usr/local -l linux -o ./obj -qq ${RUMPRUN_PLATFORM} build
+	./build-rr.sh -d /usr/local -r linux -o ./obj -qq ${RUMPRUN_PLATFORM} build
 	sudo ./build-rr.sh -d /usr/local -o ./obj ${RUMPRUN_PLATFORM} install
 )
 echo RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE} >config.mk
