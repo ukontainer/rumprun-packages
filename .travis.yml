@@ -49,7 +49,7 @@ env:
     - PACKAGE=zeromq RUMPKERNEL=netbsd
     - PACKAGE=servus RUMPKERNEL=netbsd
     - PACKAGE=zerobuf RUMPKERNEL=netbsd
-   - PACKAGE=libcurl RUMPKERNEL=linux
+    - PACKAGE=libcurl RUMPKERNEL=linux
     - PACKAGE=libevent RUMPKERNEL=linux
     - PACKAGE=libressl RUMPKERNEL=linux
     - PACKAGE=libxml2 RUMPKERNEL=linux
