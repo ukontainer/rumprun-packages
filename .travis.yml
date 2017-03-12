@@ -49,11 +49,7 @@ env:
     - PACKAGE=zeromq RUMPKERNEL=netbsd
     - PACKAGE=servus RUMPKERNEL=netbsd
     - PACKAGE=zerobuf RUMPKERNEL=netbsd
-    - PACKAGE=erlang RUMPKERNEL=linux
-    - PACKAGE=haproxy RUMPKERNEL=linux
-    - PACKAGE=hiawatha RUMPKERNEL=linux
-    - PACKAGE=leveldb RUMPKERNEL=linux
-    - PACKAGE=libcurl RUMPKERNEL=linux
+   - PACKAGE=libcurl RUMPKERNEL=linux
     - PACKAGE=libevent RUMPKERNEL=linux
     - PACKAGE=libressl RUMPKERNEL=linux
     - PACKAGE=libxml2 RUMPKERNEL=linux
@@ -88,6 +84,42 @@ env:
     - PACKAGE=servus RUMPKERNEL=linux
     - PACKAGE=zerobuf RUMPKERNEL=linux
 
+matrix:
+  allow_failures:
+# no crypto.a
+    - env: PACKAGE=erlang RUMPKERNEL=linux
+# no libevent
+    - env: PACKAGE=haproxy RUMPKERNEL=linux
+# no libz
+    - env: PACKAGE=hiawatha RUMPKERNEL=linux
+# no g++
+    - env: PACKAGE=leveldb RUMPKERNEL=linux
+# no audio_info_t
+    - env: PACKAGE=mpg123 RUMPKERNEL=linux
+# no Get_Error
+    - env: PACKAGE=ngircd RUMPKERNEL=linux
+# no g++
+    - env: PACKAGE=nodejs RUMPKERNEL=linux
+# no libz
+    - env: PACKAGE=php5 RUMPKERNEL=linux
+# no libz
+    - env: PACKAGE=python3 RUMPKERNEL=linux
+# no libz
+    - env: PACKAGE=tor RUMPKERNEL=linux
+# no same as netbsd (404)
+    - env: PACKAGE=apache2 RUMPKERNEL=linux
+# no g++
+    - env: PACKAGE=openjdk8 RUMPKERNEL=linux
+# no net/if_packet.h
+    - env: PACKAGE=ovs RUMPKERNEL=linux
+# no g++
+    - env: PACKAGE=zeromq RUMPKERNEL=linux
+# no g++
+    - env: PACKAGE=servus RUMPKERNEL=linux
+# no g++
+    - env: PACKAGE=zerobuf RUMPKERNEL=linux
+
+ 
       # notifications:
       #   irc:
       #     channels:
