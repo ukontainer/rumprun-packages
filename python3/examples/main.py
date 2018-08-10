@@ -5,7 +5,6 @@ import socket
 # Importing these verifies that our static modules built correctly
 import math
 import ssl
-import zlib
 import json
 import csv
 

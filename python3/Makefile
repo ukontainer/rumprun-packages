@@ -4,7 +4,7 @@ UPSTREAM=https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tar.xz
 TARBALL=$(notdir $(UPSTREAM))
 ARCH=$(shell $(HOST_CC) -dumpmachine)
 
-all: libssl $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a images/python.iso
+all: libssl $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a images/python.iso images/python.img
 
 .NOTPARALLEL: $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a
 $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a:
@@ -59,15 +59,25 @@ build/stamp_patch: build/configure patches/*
 build/Makefile: build/stamp_patch
 	(cd build; $(PYTHON_CONF_ENV) ./configure $(PYTHON_CONF_OPTS))
 
-images/python.iso: build/python
+images/python.iso images/python.img: build/python
 	mkdir -p images
 	$(RUMPRUN_GENISOIMAGE) -o images/python.iso build/pythondist/lib/python3.5
+	mkdir -p mnt
+	dd if=/dev/zero of=images/python.img bs=1M count=96
+	mkfs.ext4 -F images/python.img
+	sudo mount -o loop images/python.img mnt
+	sudo mkdir -p mnt/python/lib
+	sudo cp -rpf build/pythondist/lib/python3.5 mnt/python/lib/
+	sudo cp examples/main.py mnt/
+	sudo umount mnt
+	rmdir mnt
 
 .PHONY: clean
 clean:
 	-$(MAKE) -C build clean
 	rm -f bin/*
 	rm -f images/python.iso
+	rm -f images/python.img
 	rm -f examples/hw.c examples/hw.bin examples/hw
 
 .PHONY: distclean

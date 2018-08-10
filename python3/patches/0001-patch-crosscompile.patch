@@ -14,7 +14,7 @@
  			_host_cpu=$host_cpu
  		esac
  		;;
-+	*-*-netbsd*)
++	*-rumprun-linux*)
 +		_host_cpu=$host_cpu
 +		;;
  	*-*-cygwin*)
