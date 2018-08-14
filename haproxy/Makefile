@@ -14,7 +14,7 @@ $(RUMPRUN_PKGS_DIR)/lib/libpcre.a:
 	$(MAKE) -C ../pcre
 
 $(HAPROXY_BIN): untar
-	$(MAKE) -C build TARGET=netbsd CC=$(RUMPRUN_CC) $(HAPROXY_CONF)
+	$(MAKE) -C build TARGET=linux CC=$(RUMPRUN_CC) $(HAPROXY_CONF)
 
 untar: dl/$(TARBALL)
 	mkdir -p build
