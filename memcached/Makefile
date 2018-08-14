@@ -16,7 +16,8 @@ MEMCACHED_CONF_ENV += \
 MEMCACHED_CONF_OPTS += \
 	--prefix=$(shell pwd)/build/dist \
 	--host=$(RUMPRUN_TOOLCHAIN_TUPLE) \
-	--with-libevent=$(shell pwd)/../../pkgs
+	--with-libevent=$(shell pwd)/../../pkgs \
+	--disable-coverage
 
 build/stamp_patch:
 	(cd build && ../../scripts/apply-patches.sh ./ ../patches/*)
