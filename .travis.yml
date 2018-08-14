@@ -49,6 +49,10 @@ env:
           #     - PACKAGE=zeromq RUMPKERNEL=netbsd
           #     - PACKAGE=servus RUMPKERNEL=netbsd
           #     - PACKAGE=zerobuf RUMPKERNEL=netbsd
+    - PACKAGE=erlang RUMPKERNEL=linux
+    - PACKAGE=haproxy RUMPKERNEL=linux
+    - PACKAGE=hiawatha RUMPKERNEL=linux
+    - PACKAGE=leveldb RUMPKERNEL=linux
     - PACKAGE=libcurl RUMPKERNEL=linux
     - PACKAGE=libevent RUMPKERNEL=linux
     - PACKAGE=libressl RUMPKERNEL=linux
@@ -89,9 +93,7 @@ matrix:
   allow_failures:
 # no crypto.a
     - env: PACKAGE=erlang RUMPKERNEL=linux
-# no libevent
-    - env: PACKAGE=haproxy RUMPKERNEL=linux
-# no libz
+# no toolchain.cmake
     - env: PACKAGE=hiawatha RUMPKERNEL=linux
 # no g++
     - env: PACKAGE=leveldb RUMPKERNEL=linux
@@ -132,3 +134,4 @@ matrix:
       #       - rumpkernel-builds@freelists.org
       #     on_success: always
       #     on_failure: always
+
