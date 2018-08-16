@@ -1,0 +1,15 @@
+{
+    "interfaces": [
+        {
+            "ip": "1.1.1.5",
+            "masklen": "24",
+            "param": "3",
+            "offload": "0xc803",
+            "type": "rumpfd"
+        }
+    ],
+    "debug": "1",
+    "singlecpu": "1",
+    "delay_main": "50000",
+    "sysctl": "net.ipv4.tcp_wmem=4096 87380 100000000"
+}

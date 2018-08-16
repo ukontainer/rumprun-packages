@@ -1,0 +1,25 @@
+From 5e3673830b4af185e1e8db9d0d049161b2d55887 Mon Sep 17 00:00:00 2001
+From: Hajime Tazaki <thehajime@gmail.com>
+Date: Thu, 16 Aug 2018 16:05:38 +0900
+Subject: [PATCH] disable setpgrp check on cross compile
+
+---
+ configure | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/configure b/configure
+index d7446d0..69aba7b 100755
+--- a/configure
++++ b/configure
+@@ -5840,7 +5840,7 @@ if ${ac_cv_func_setpgrp_void+:} false; then :
+   $as_echo_n "(cached) " >&6
+ else
+   if test "$cross_compiling" = yes; then :
+-  as_fn_error $? "cannot check setpgrp when cross compiling" "$LINENO" 5
++  $as_echo_n "cannot check setpgrp when cross compiling" "$LINENO" 5
+ else
+   cat confdefs.h - <<_ACEOF >conftest.$ac_ext
+ /* end confdefs.h.  */
+-- 
+2.17.1
+

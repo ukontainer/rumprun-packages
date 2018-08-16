@@ -1,0 +1,22 @@
+From dabeceb1e7484096aa4cb4ea59e8cadb5aef1404 Mon Sep 17 00:00:00 2001
+From: Hajime Tazaki <thehajime@gmail.com>
+Date: Thu, 16 Aug 2018 16:45:55 +0900
+Subject: [PATCH] disable doc build
+
+---
+ Makefile.am | 2 +-
+ 1 file changed, 1 insertion(+), 1 deletion(-)
+
+diff --git a/Makefile.am b/Makefile.am
+index fbbd95e..43bdfb3 100644
+--- a/Makefile.am
++++ b/Makefile.am
+@@ -1,4 +1,4 @@
+ 
+ AUTOMAKE_OPTIONS = dist-bzip2 dist-zip
+-SUBDIRS = src doc
++SUBDIRS = src
+ EXTRA_DIST = README.* Release_Notes inet_ntop.c autogen.sh m4
+-- 
+2.17.1
+

@@ -25,6 +25,7 @@ env:
           #   # broken: issue #106
           #   #  - PACKAGE=mysql RUMPKERNEL=netbsd
           #     - PACKAGE=nanomsg RUMPKERNEL=netbsd
+          #     - PACKAGE=netperf RUMPKERNEL=netbsd
           #     - PACKAGE=nginx RUMPKERNEL=netbsd
           #     - PACKAGE=ngircd RUMPKERNEL=netbsd
           #     - PACKAGE=nodejs RUMPKERNEL=netbsd
@@ -63,6 +64,7 @@ env:
   # broken: issue #106
   #  - PACKAGE=mysql RUMPKERNEL=linux
     - PACKAGE=nanomsg RUMPKERNEL=linux
+    - PACKAGE=netperf RUMPKERNEL=linux
     - PACKAGE=nginx RUMPKERNEL=linux
     - PACKAGE=ngircd RUMPKERNEL=linux
     - PACKAGE=nodejs RUMPKERNEL=linux
