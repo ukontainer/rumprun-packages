@@ -3,7 +3,8 @@
 # mysql: makefs
 sudo apt-get update
 sudo apt-get install makefs genisoimage
-sudo apt-get install openjdk-7-jdk
+# XXX: take too long..
+#sudo apt-get install openjdk-7-jdk
 
 # Build and install rumprun toolchain from source
 RUMPKERNEL=${RUMPKERNEL:-netbsd}
