@@ -17,7 +17,8 @@ MEMCACHED_CONF_OPTS += \
 	--prefix=$(shell pwd)/build/dist \
 	--host=$(RUMPRUN_TOOLCHAIN_TUPLE) \
 	--with-libevent=$(shell pwd)/../../pkgs \
-	--disable-coverage
+	--disable-coverage \
+	--build=x86_64-unknown-netbsd
 
 build/stamp_patch:
 	(cd build && ../../scripts/apply-patches.sh ./ ../patches/*)

@@ -16,7 +16,8 @@ SQLITE_CONF_OPTS += \
 
 build/Makefile: build/configure
 	(cd build; \
-	./configure --host=$(RUMPRUN_TOOLCHAIN_TUPLE) $(SQLITE_CONF_OPTS);)
+	./configure --host=$(RUMPRUN_TOOLCHAIN_TUPLE) \
+        -build=x86_64-unknown-netbsd $(SQLITE_CONF_OPTS);)
 
 dl/$(TARBALL):
 	mkdir -p dl

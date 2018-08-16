@@ -13,7 +13,8 @@ build/libevent: build/Makefile
 
 LIBEVENT_CONF_OPTS += \
 	--prefix=$(RUMPRUN_PKGS_DIR) \
-	--disable-shared
+	--disable-shared \
+	--build=x86_64-unknown-netbsd
 
 build/Makefile: build/configure
 	(cd build; \

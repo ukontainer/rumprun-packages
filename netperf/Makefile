@@ -20,7 +20,7 @@ build/src/netperf: build/Makefile
 
 build/Makefile: build/configure build/stamp_patch
 	(cd build/ && \
-		./configure --host=$(RUMPRUN_TOOLCHAIN_TUPLE) $(NETPERF_CONF_OPTS);)
+		./configure --build=x86_64-unknown-netbsd --host=$(RUMPRUN_TOOLCHAIN_TUPLE) $(NETPERF_CONF_OPTS);)
 
 build/configure:
 	mkdir -p build

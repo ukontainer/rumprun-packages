@@ -4,7 +4,7 @@ UPSTREAM=http://de1.php.net/get/php-7.0.3.tar.bz2/from/this/mirror
 TARBALL=php.tar.bz2
 
 # "Minimal" build.
-all: CONFIGURE_OPTS := --disable-all --enable-cli
+all: CONFIGURE_OPTS := --disable-all --enable-cli --build=x86_64-unknown-netbsd
 
 all: bin/php-cgi bin/php images
 

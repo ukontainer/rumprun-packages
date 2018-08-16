@@ -15,7 +15,8 @@ libcurl_CONF_OPTS += \
 	--prefix=$(RUMPRUN_PKGS_DIR) \
 	--with-ssl \
 	--with-zlib \
-	--enable-shared=no
+	--enable-shared=no \
+	--build=x86_64-unknown-netbsd
 	
 build/Makefile: build/configure
 	(cd build; \
