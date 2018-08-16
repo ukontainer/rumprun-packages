@@ -20,3 +20,7 @@ RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE:-x86_64-rumprun-${RUMPKERNEL}}
 #)
 
 echo RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE} >config.mk
+
+# copy pre-build rumprun toolchain
+mkdir -p /tmp/frankenlibc
+docker run -v /tmp:/external $DOCKER_USERNAME/travis-build-frankenlibc cp -rpf /rump /external/frankenlibc/

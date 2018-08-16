@@ -4,8 +4,21 @@ language: generic
 cache:
   directories:
     - $HOME/.ccache
-install: bash -ex ./.travis-install.sh
-script: bash -ex ./.travis-script.sh
+script: bash -ex ./.travis-install.sh && bash -ex ./.travis-script.sh
+
+stages:
+  - rumprun toolchain
+  - test
+  - deploy
+
+jobs:
+  include:
+    - stage: rumprun toolchain
+      script: bash -ex ./.travis-prep.sh
+      env: RUMPKERNEL=linux
+    - stage: deploy
+      script: bash -ex ./.travis-install.sh && bash -ex ./.travis-deploy-docker.sh
+      env: RUMPKERNEL=linux
 
 env:
   global:
