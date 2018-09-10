@@ -10,12 +10,16 @@ else
 all: $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a images/python.iso
 endif
 
+ifeq ($(shell uname),Darwin)
+PYTHON_CONF_OPTS += --with-suffix=.exe
+EXESUFFIX = .exe
+endif
 
 .NOTPARALLEL: $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a
 $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a:
 	$(MAKE) -C ../sqlite
 
-build/python: build/Makefile
+build/python$(EXESUFFIX): build/Makefile
 	$(MAKE) -C build
 	$(MAKE) -C build install
 
@@ -47,7 +51,7 @@ build/hostpython: | dl/$(TARBALL)
 	mkdir -p build
 	(cd build && tar -x --strip-components 1 -f ../dl/$(TARBALL))
 	(cd build; ./configure --prefix=$(shell pwd)/build/hostdist; make python Parser/pgen && make install)
-	mv build/python build/hostpython
+	mv build/python$(EXESUFFIX) build/hostpython
 
 build/Parser/hostpgen: build/hostpython
 	cp build/Parser/pgen build/Parser/hostpgen
@@ -80,11 +84,11 @@ endif
 build/Makefile: build/stamp_patch
 	(cd build; $(PYTHON_CONF_ENV) ./configure $(PYTHON_CONF_OPTS))
 
-images/python.iso: build/python
+images/python.iso: build/python$(EXESUFFIX)
 	mkdir -p images
 	$(RUMPRUN_GENISOIMAGE) -o images/python.iso build/pythondist/lib/python3.5
 
-images/python.img: build/python
+images/python.img: build/python$(EXESUFFIX)
 	mkdir -p images
 	mkdir -p mnt
 	dd if=/dev/zero of=images/python.img bs=1M count=96
