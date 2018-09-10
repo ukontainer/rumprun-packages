@@ -1,0 +1,12 @@
+--- a/Makefile.pre.in	2016-06-26 06:38:37.000000000 +0900
++++ b/Makefile.pre.in	2018-09-10 08:44:15.000000000 +0900
+@@ -96,7 +96,7 @@
+ LDLAST=		@LDLAST@
+ SGI_ABI=	@SGI_ABI@
+ CCSHARED=	@CCSHARED@
+-LINKFORSHARED=	@LINKFORSHARED@
++#LINKFORSHARED=	@LINKFORSHARED@
+ ARFLAGS=	@ARFLAGS@
+ # Extra C flags added for building the interpreter object files.
+ CFLAGSFORSHARED=@CFLAGSFORSHARED@
+

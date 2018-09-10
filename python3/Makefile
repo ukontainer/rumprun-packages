@@ -4,7 +4,12 @@ UPSTREAM=https://www.python.org/ftp/python/3.5.2/Python-3.5.2.tar.xz
 TARBALL=$(notdir $(UPSTREAM))
 ARCH=$(shell $(HOST_CC) -dumpmachine)
 
+ifeq ($(shell uname),Linux)
 all: libssl $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a images/python.iso images/python.img
+else
+all: $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a images/python.iso
+endif
+
 
 .NOTPARALLEL: $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a
 $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a:
@@ -28,8 +33,11 @@ PYTHON_CONF_OPTS += \
 	--host=$(RUMPRUN_TOOLCHAIN_TUPLE) \
 	--build $(ARCH) \
 	--enable-ipv6 \
-	--with-openssl=${RUMPRUN_PKGS_DIR} \
 	--without-ensurepip
+
+ifeq ($(shell uname),Linux)
+PYTHON_CONF_OPTS += --with-openssl=${RUMPRUN_PKGS_DIR}
+endif
 
 dl/$(TARBALL):
 	mkdir -p dl
@@ -54,14 +62,30 @@ build/stamp_patch: build/configure patches/*
 	cp config.site build/
 	(cd build && ../../scripts/apply-patches.sh ./ ../patches/*)
 	cp -R files/* build/Modules/
+	# FIXME: (Darwin)
+ifeq ($(shell uname),Darwin)
+	sed "s/import ssl/\#import ssl/" examples/main.py > /tmp/a
+	mv /tmp/a examples/main.py
+	rm -f /tmp/a
+
+	sed "s/_ssl/\#_ssl/" build/Modules/Setup.dist \
+	      | sed "s/-DUSE_SSL/\#-DUSE_SSL/" \
+	      | sed 's/-L\$$(SSL/\#-L\$$(SSL/' \
+	      > /tmp/a
+	mv /tmp/a build/Modules/Setup.dist
+	rm -f /tmp/a
+endif
 	touch $@
 
 build/Makefile: build/stamp_patch
 	(cd build; $(PYTHON_CONF_ENV) ./configure $(PYTHON_CONF_OPTS))
 
-images/python.iso images/python.img: build/python
+images/python.iso: build/python
 	mkdir -p images
 	$(RUMPRUN_GENISOIMAGE) -o images/python.iso build/pythondist/lib/python3.5
+
+images/python.img: build/python
+	mkdir -p images
 	mkdir -p mnt
 	dd if=/dev/zero of=images/python.img bs=1M count=96
 	mkfs.ext4 -F images/python.img
