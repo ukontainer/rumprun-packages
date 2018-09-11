@@ -6,6 +6,10 @@ cache:
     - $HOME/.ccache
 script: bash -ex ./.travis-install.sh && bash -ex ./.travis-script.sh
 
+os:
+  - osx
+  - linux
+
 stages:
   - rumprun toolchain
   - test
@@ -15,9 +19,25 @@ jobs:
   include:
     - stage: rumprun toolchain
       script: bash -ex ./.travis-prep.sh
+      os: osx
+      env: RUMPKERNEL=linux
+      before_install:
+        - travis_wait 30 git submodule update --init
+        - mkdir -p ~/.local/bin
+        - mkdir ~/junit
+        - export PATH=/usr/local/opt/ccache/libexec:$HOME/.local/bin:$PATH
+        - brew install gnu-sed ccache e2fsprogs
+        - pip install --user yamlish junit_xml
+        - ln -sf /usr/local/bin/gsed ~/.local/bin/sed
+        - ln -sf /usr/local/bin/gdate ~/.local/bin/date
+        - ln -sf /usr/local/opt/e2fsprogs/sbin/mkfs.ext4 ~/.local/bin/
+    - stage: rumprun toolchain
+      script: bash -ex ./.travis-prep.sh
+      os: linux
       env: RUMPKERNEL=linux
     - stage: deploy
-      script: bash -ex ./.travis-install.sh && bash -ex ./.travis-deploy-docker.sh
+      script: bash -ex ./.travis-deploy-docker.sh
+      os: linux
       env: RUMPKERNEL=linux
 
 env:
@@ -134,6 +154,25 @@ matrix:
     - env: PACKAGE=servus RUMPKERNEL=linux
 # no g++
     - env: PACKAGE=zerobuf RUMPKERNEL=linux
+# osx (TO_BE_FIXED)
+    - env: PACKAGE=libevent RUMPKERNEL=linux
+      os: osx
+    - env: PACKAGE=libressl RUMPKERNEL=linux
+      os: osx
+    - env: PACKAGE=libxml2 RUMPKERNEL=linux
+      os: osx
+    - env: PACKAGE=mathopd RUMPKERNEL=linux
+      os: osx
+    - env: PACKAGE=memcached RUMPKERNEL=linux
+      os: osx
+    - env: PACKAGE=php7 RUMPKERNEL=linux
+      os: osx
+    - env: PACKAGE=redis RUMPKERNEL=linux
+      os: osx
+    - env: PACKAGE=ruby RUMPKERNEL=linux
+      os: osx
+    - env: PACKAGE=libffi RUMPKERNEL=linux
+      os: osx
 
  
       # notifications:

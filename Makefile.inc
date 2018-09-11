@@ -25,7 +25,7 @@ RUMPRUN_SYSROOT:=$(shell ${RUMPRUN_CC} -print-sysroot)
 RUMPRUN_CMAKE_TOOLCHAIN_FILE:=${RUMPRUN_SYSROOT}/share/${RUMPRUN_TOOLCHAIN_TUPLE}-toolchain.cmake
 
 ifeq ($(shell uname),Darwin)
-RUMPRUN_GENISOIMAGE=hdiutil makehybrid -iso
+RUMPRUN_GENISOIMAGE=hdiutil makehybrid  -joliet -iso
 else
 RUMPRUN_GENISOIMAGE=genisoimage -l -r
 endif
