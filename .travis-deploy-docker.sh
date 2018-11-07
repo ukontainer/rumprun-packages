@@ -1,6 +1,8 @@
 #!/bin/bash
 # build additional packages to be deployed
 
+VERSION=0.1
+
 deploy() {
 git clone -q https://github.com/thehajime/runu-base.git
 (
@@ -28,9 +30,10 @@ git clone -q https://github.com/thehajime/runu-base.git
        ls -lR .
        # push an image to docker hub
        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-       docker build -t $DOCKER_USERNAME/runu-base:$OS .
+       docker build -t $DOCKER_USERNAME/runu-base:$VERSION-$OS .
        docker images
-       docker push $DOCKER_USERNAME/runu-base:$OS
+       docker push $DOCKER_USERNAME/runu-base:$VERSION-$OS
+
 )
 }
 
@@ -38,3 +41,27 @@ deploy linux
 rm -rf runu-base
 deploy osx
 
+# create multi-arch image
+curl -fsSL  curl -O https://download.docker.com/linux/static/stable/x86_64/docker-18.06.1-ce.tgz \
+     -o /tmp/docker-18.06.1-ce.tgz
+tar xfz /tmp/docker-18.06.1-ce.tgz -C /tmp/
+chmod +x /tmp/docker/docker
+
+# enable experimental features
+cat  ~/.docker/config.json | jq '. += {"experimental": "enabled"}' > /tmp/1
+mv /tmp/1 ~/.docker/config.json
+
+/tmp/docker/docker -D manifest create $DOCKER_USERNAME/runu-base:$VERSION \
+			$DOCKER_USERNAME/runu-base:$VERSION-osx \
+			$DOCKER_USERNAME/runu-base:$VERSION-linux
+
+/tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/runu-base:$VERSION \
+			$DOCKER_USERNAME/runu-base:$VERSION-osx \
+			--os darwin --arch amd64
+/tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/runu-base:$VERSION \
+			$DOCKER_USERNAME/runu-base:$VERSION-linux \
+			--os linux --arch amd64
+/tmp/docker/docker -D manifest push $DOCKER_USERNAME/runu-base:$VERSION
+
+/tmp/docker/docker -D manifest inspect thehajime/runu-base:0.1
+/tmp/docker/docker -D manifest inspect -v thehajime/runu-base:0.1
