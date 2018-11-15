@@ -11,38 +11,21 @@ os:
   - linux
 
 stages:
-  - rumprun toolchain
   - test
   - deploy
 
 jobs:
   include:
-    - stage: rumprun toolchain
-      script: bash -ex ./.travis-prep.sh
-      os: osx
-      env: RUMPKERNEL=linux
-      before_install:
-        - travis_wait 30 git submodule update --init
-        - mkdir -p ~/.local/bin
-        - mkdir ~/junit
-        - export PATH=/usr/local/opt/ccache/libexec:$HOME/.local/bin:$PATH
-        - HOMEBREW_NO_AUTO_UPDATE=1 brew install gnu-sed ccache e2fsprogs
-        - pip install --user yamlish junit_xml
-        - ln -sf /usr/local/bin/gsed ~/.local/bin/sed
-        - ln -sf /usr/local/bin/gdate ~/.local/bin/date
-        - ln -sf /usr/local/opt/e2fsprogs/sbin/mkfs.ext4 ~/.local/bin/
-    - stage: rumprun toolchain
-      script: bash -ex ./.travis-prep.sh
-      os: linux
-      env: RUMPKERNEL=linux
     - stage: deploy
-      script: bash -ex ./.travis-deploy-docker.sh
+      script:
+        - bash -ex ./.travis-deploy-docker.sh
+        - bash -ex ./.travis-trigger.sh ukontainer/runu
       os: linux
       env: RUMPKERNEL=linux
 
 env:
   global:
-    - PATH="/usr/lib/ccache:/tmp/frankenlibc/rump/bin:$PATH"
+    - PATH="/usr/lib/ccache:/opt/rump/bin:$PATH"
   matrix:
           #     - PACKAGE=erlang RUMPKERNEL=netbsd
           #     - PACKAGE=haproxy RUMPKERNEL=netbsd

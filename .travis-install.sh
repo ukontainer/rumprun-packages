@@ -24,11 +24,7 @@ RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE:-x86_64-rumprun-${RUMPKERNEL}}
 echo RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE} >config.mk
 
 # copy pre-build rumprun toolchain
-mkdir -p /tmp/frankenlibc
-curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/x86_64-rumprun-linux/$TRAVIS_OS_NAME/frankenlibc.tar.gz -o /tmp/frankenlibc.tar.gz
-tar xfz /tmp/frankenlibc.tar.gz -C /tmp/frankenlibc/
-
-if [ $TRAVIS_OS_NAME == "osx" ] ; then
-	# *-cc is recognized as *-CC in case-insensitive filesystem
-	cd /tmp/frankenlibc/rump/bin && ln -fs x86_64-rumprun-linux-clang x86_64-rumprun-linux-gcc && rm -f x86_64-rumprun-linux-cc
-fi
+curl -L https://dl.bintray.com/libos-nuse/x86_64-rumprun-linux/$TRAVIS_OS_NAME/frankenlibc.tar.gz \
+     -o /tmp/frankenlibc.tar.gz
+sudo mkdir -p /opt/rump && sudo chown $USER /opt/rump
+tar xfz /tmp/frankenlibc.tar.gz -C /

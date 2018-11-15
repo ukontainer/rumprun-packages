@@ -12,32 +12,34 @@ else
 	make -j2
 fi
 
+
 if [ "${PACKAGE}" == "nginx" ]; then
 	curl -T bin/nginx -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/nginx
+	       "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/nginx;override=1&publish=1"
 	curl -T images/data.iso -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	      https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/data.iso
+	      "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/data.iso;override=1&publish=1"
 fi
 
-if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-	EXESUFFIX=.exe
-fi
 if [ "${PACKAGE}" == "python3" ]; then
+	if [ "$TRAVIS_OS_NAME" == "osx" ]; then
+		EXESUFFIX=.exe
+	fi
+
 	curl -T build/python$EXESUFFIX -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/python
+	       "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/python;override=1&publish=1"
 	if [ "$TRAVIS_OS_NAME" == "linux" ]; then
 	  curl -T images/python.img -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	      https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/python.img
+	      "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/python.img;override=1&publish=1"
 	fi
  
 	curl -T images/python.iso -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	      https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/python.iso
+	      "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/python.iso;override=1&publish=1"
 fi
 
 if [ "${PACKAGE}" == "netperf" ]; then
 	curl -T build/src/netperf -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/netperf
+	       "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/netperf;override=1&publish=1"
 	curl -T build/src/netserver -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	      https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/netserver
+	      "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/netserver;override=1&publish=1"
 fi
 

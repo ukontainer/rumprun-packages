@@ -20,11 +20,13 @@ git clone -q https://github.com/thehajime/runu-base.git
        curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/runu-rumprun-packages/linux/python.img -o imgs/python.img
        curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/runu-rumprun-packages/$OS/python.iso -o imgs/python.iso
 
-       curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/x86_64-rumprun-linux/$OS/frankenlibc.tar.gz -o /tmp/frankenlibc.tar.gz
+       curl -L https://dl.bintray.com/libos-nuse/x86_64-rumprun-linux/$OS/frankenlibc.tar.gz \
+	    -o /tmp/frankenlibc.tar.gz
        tar xfz /tmp/frankenlibc.tar.gz -C /tmp/
-       cp -f /tmp/rump/bin/hello bin
-       cp -f /tmp/rump/bin/ping bin
-       cp -f /tmp/rump/bin/rexec sbin
+       cp -f /tmp/opt/rump/bin/hello bin
+       cp -f /tmp/opt/rump/bin/ping bin
+       cp -f /tmp/opt/rump/bin/ping6 bin
+       cp -f /tmp/opt/rump/bin/rexec sbin
        chmod +x sbin/* bin/*
 
        ls -lR .
