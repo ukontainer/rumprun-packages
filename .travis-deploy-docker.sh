@@ -15,6 +15,7 @@ git clone -q https://github.com/thehajime/runu-base.git
        curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/runu-rumprun-packages/$OS/python -o bin/python
        curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/runu-rumprun-packages/$OS/netperf -o bin/netperf
        curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/runu-rumprun-packages/$OS/netserver -o bin/netserver
+       curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/runu-rumprun-packages/$OS/sqlite-bench -o bin/sqlite-bench
        # copy rootfs images
        curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/runu-rumprun-packages/$OS/data.iso -o imgs/data.iso
        curl -u $BINTRAY_USER:$BINTRAY_APIKEY https://dl.bintray.com/libos-nuse/runu-rumprun-packages/linux/python.img -o imgs/python.img

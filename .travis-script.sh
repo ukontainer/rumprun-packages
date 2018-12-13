@@ -43,3 +43,7 @@ if [ "${PACKAGE}" == "netperf" ]; then
 	      "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/netserver;override=1&publish=1"
 fi
 
+if [ "${PACKAGE}" == "sqlite-bench" ]; then
+	curl -T bin/sqlite-bench -u$BINTRAY_USER:$BINTRAY_APIKEY \
+	       "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/sqlite-bench;override=1&publish=1"
+fi

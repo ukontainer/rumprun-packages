@@ -58,6 +58,7 @@ env:
           #   # Disabled, build takes several hours
           #   #  - PACKAGE=rust RUMPKERNEL=netbsd
           #     - PACKAGE=sqlite RUMPKERNEL=netbsd
+          #     - PACKAGE=sqlite-bench RUMPKERNEL=netbsd
           #     - PACKAGE=tor RUMPKERNEL=netbsd
           #     - PACKAGE=apache2 RUMPKERNEL=netbsd
           #     - PACKAGE=libffi RUMPKERNEL=netbsd
@@ -98,6 +99,7 @@ env:
   # Disabled, build takes several hours
   #  - PACKAGE=rust RUMPKERNEL=linux
     - PACKAGE=sqlite RUMPKERNEL=linux
+    - PACKAGE=sqlite-bench RUMPKERNEL=linux
     - PACKAGE=tor RUMPKERNEL=linux
     - PACKAGE=apache2 RUMPKERNEL=linux
     - PACKAGE=libffi RUMPKERNEL=linux
