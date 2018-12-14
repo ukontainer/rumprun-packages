@@ -3,7 +3,7 @@
         {
             "ip": "1.1.1.5",
             "masklen": "24",
-            "param": "3",
+            "name": "tap0",
             "type": "rumpfd"
         }
     ],
