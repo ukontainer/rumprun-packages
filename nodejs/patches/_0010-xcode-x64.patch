@@ -1,0 +1,29 @@
+--- tools/gyp/pylib/gyp/xcode_emulation.py.orig	2019-04-03 23:44:32.000000000 +0900
++++ tools/gyp/pylib/gyp/xcode_emulation.py	2019-05-31 09:34:47.000000000 +0900
+@@ -420,7 +420,7 @@
+     xcode_archs_default = GetXcodeArchsDefault()
+     return xcode_archs_default.ActiveArchs(
+         config_settings.get('ARCHS'),
+-        config_settings.get('VALID_ARCHS'),
++        ['x86_64'],
+         config_settings.get('SDKROOT'))
+ 
+   def _GetSdkVersionInfoItem(self, sdk, infoitem):
+@@ -552,7 +552,7 @@
+     if len(archs) != 1:
+       # TODO: Supporting fat binaries will be annoying.
+       self._WarnUnimplemented('ARCHS')
+-      archs = ['i386']
++      archs = ['x86_64']
+     cflags.append('-arch ' + archs[0])
+ 
+     if archs[0] in ('i386', 'x86_64'):
+@@ -810,7 +810,7 @@
+     if len(archs) != 1:
+       # TODO: Supporting fat binaries will be annoying.
+       self._WarnUnimplemented('ARCHS')
+-      archs = ['i386']
++      archs = ['x86_64']
+     ldflags.append('-arch ' + archs[0])
+ 
+     # Xcode adds the product directory by default.

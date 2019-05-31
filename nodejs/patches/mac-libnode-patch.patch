@@ -1,0 +1,12 @@
+diff -ur /tmp/node-6.17.1/common.gypi build-6.17.1/common.gypi
+--- common.gypi.orig	2019-04-03 23:44:32.000000000 +0900
++++ common.gypi	2019-05-30 23:48:57.000000000 +0900
+@@ -51,7 +51,7 @@
+             'V8_BASE': '<(PRODUCT_DIR)/obj/deps/v8/tools/gyp/libv8_base.a',
+           }, {
+             'OBJ_DIR%': '<(PRODUCT_DIR)/obj.target',
+-            'V8_BASE%': '<(PRODUCT_DIR)/obj.target/deps/v8/tools/gyp/libv8_base.a',
++            'V8_BASE%': '<(PRODUCT_DIR)/libv8_base.a',
+           }],
+         ],
+       }],

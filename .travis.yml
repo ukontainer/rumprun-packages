@@ -121,8 +121,6 @@ matrix:
     - env: PACKAGE=mpg123 RUMPKERNEL=linux
 # no Get_Error
     - env: PACKAGE=ngircd RUMPKERNEL=linux
-# no g++
-    - env: PACKAGE=nodejs RUMPKERNEL=linux
 # no libz
     - env: PACKAGE=php5 RUMPKERNEL=linux
 # no libz

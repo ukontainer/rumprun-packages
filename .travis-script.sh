@@ -47,3 +47,8 @@ if [ "${PACKAGE}" == "sqlite-bench" ]; then
 	curl -T bin/sqlite-bench -u$BINTRAY_USER:$BINTRAY_APIKEY \
 	       "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/sqlite-bench;override=1&publish=1"
 fi
+
+if [ "${PACKAGE}" == "nodejs" ]; then
+	curl -T bin/node -u$BINTRAY_USER:$BINTRAY_APIKEY \
+	       "https://api.bintray.com/content/libos-nuse/runu-rumprun-packages/all/dev/$TRAVIS_OS_NAME/node;override=1&publish=1"
+fi

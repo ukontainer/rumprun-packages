@@ -19,10 +19,17 @@ endif
 
 export CC=$(RUMPRUN_TOOLCHAIN_TUPLE)-gcc
 export CXX=$(RUMPRUN_TOOLCHAIN_TUPLE)-g++
+export CC_host=clang
+export CXX_host=clang++
 export AR=$(RUMPRUN_TOOLCHAIN_TUPLE)-ar
 export RANLIB=$(RUMPRUN_TOOLCHAIN_TUPLE)-ranlib
-export LINK=$(CXX)
+export LINK_target=$(CXX)
+export LINK=$(CXX_host)
 export GYP_DEFINES="OS=netbsd"
+ifeq ($(RUMPRUN_TOOLCHAIN_TUPLE),x86_64-rumprun-linux)
+export GYP_DEFINES="OS=linux"
+endif
+export CXXFLAGS=-std=c++11
 
 NODE_OUT=$(BUILD_DIR)/out/Release/node
 
@@ -33,12 +40,18 @@ $(NODE_BIN): $(NODE_OUT)
 
 $(NODE_OUT): $(BUILD_DIR)/node.gyp $(BUILD_DIR)/config.mk _third_party_main.js rumpmain.js
 	$(MAKE) -C $(BUILD_DIR)
+	mkdir -p bin
+	cp $(NODE_OUT) bin/
 
 $(BUILD_DIR)/config.mk: $(BUILD_DIR)/stamp_patch
-	(cd $(BUILD_DIR); ./configure --without-snapshot --dest-cpu=$(CPU) --link-module=../_third_party_main.js --link-module=../rumpmain.js)
+	(cd $(BUILD_DIR); ./configure --without-snapshot --dest-cpu=$(CPU) --link-module=../_third_party_main.js --link-module=../rumpmain.js --openssl-no-asm --without-dtrace)
 
-$(BUILD_DIR)/stamp_patch: $(BUILD_DIR)/configure patches/*.patch | patches/$(PKGSRC_DIR)
-	(cd $(BUILD_DIR) && ../../scripts/apply-patches.sh -p 0 ./ ../patches/$(PKGSRC_DIR)/patch-* ../patches/*.patch)
+$(BUILD_DIR)/stamp_patch: $(BUILD_DIR)/configure patches/*.patch
+	(cd $(BUILD_DIR) && ../../scripts/apply-patches.sh -p 0 ./ ../patches/0*.patch)
+ifeq ($(shell uname -s), Darwin)
+	(cd $(BUILD_DIR) && patch -p0 < ../patches/mac-libnode-patch.patch)
+	(cd $(BUILD_DIR) && patch -p0 < ../patches/_0010-xcode-x64.patch)
+endif
 	touch $@
 
 $(BUILD_DIR)/node.gyp $(BUILD_DIR)/configure: | dl/$(TARBALL)
@@ -50,8 +63,10 @@ dl/$(TARBALL):
 	../scripts/fetch.sh $(UPSTREAM) dl/$(TARBALL)
 
 patches/$(PKGSRC_DIR):
+ifneq ($(RUMPRUN_TOOLCHAIN_TUPLE),x86_64-rumprun-linux)
 	(cd patches && cvs -q -z2 -d anoncvs@anoncvs.NetBSD.org:/cvsroot checkout -r HEAD -P $(PKGSRC_DIR))
 	perl -pi -e 's/\@PYTHONBIN@/python/g' patches/$(PKGSRC_DIR)/patch-*
+endif
 
 .PHONY: clean
 clean:
