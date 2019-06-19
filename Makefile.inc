@@ -19,8 +19,8 @@ $(error Please set RUMPRUN_TOOLCHAIN_TUPLE in the top-level config.mk)
 endif
 
 # Set convenience variables for use by package-specific Makefiles.
-RUMPRUN_CC=$(RUMPRUN_TOOLCHAIN_TUPLE)-gcc
-RUMPRUN_CXX=$(RUMPRUN_TOOLCHAIN_TUPLE)-g++
+RUMPRUN_CC=$(RUMPRUN_TOOLCHAIN_TUPLE)-cc
+RUMPRUN_CXX=$(RUMPRUN_TOOLCHAIN_TUPLE)-c++
 RUMPRUN_SYSROOT:=$(shell ${RUMPRUN_CC} -print-sysroot)
 RUMPRUN_CMAKE_TOOLCHAIN_FILE:=${RUMPRUN_SYSROOT}/share/${RUMPRUN_TOOLCHAIN_TUPLE}-toolchain.cmake
 
