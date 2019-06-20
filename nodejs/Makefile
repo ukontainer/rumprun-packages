@@ -17,8 +17,8 @@ ifndef CPU
 	$(error Unsupported CPU architecture)
 endif
 
-export CC=$(RUMPRUN_TOOLCHAIN_TUPLE)-gcc
-export CXX=$(RUMPRUN_TOOLCHAIN_TUPLE)-g++
+export CC=$(RUMPRUN_TOOLCHAIN_TUPLE)-cc
+export CXX=$(RUMPRUN_TOOLCHAIN_TUPLE)-c++
 export CC_host=clang
 export CXX_host=clang++
 export AR=$(RUMPRUN_TOOLCHAIN_TUPLE)-ar
