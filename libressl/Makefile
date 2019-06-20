@@ -11,8 +11,9 @@ build/libressl: build/Makefile
 
 liblibressl_CONF_OPTS += \
 	--prefix=$(RUMPRUN_PKGS_DIR) \
-	--enable-shared=no
-	
+	--enable-shared=no \
+	CC=$(RUMPRUN_CC)
+
 build/Makefile: build/configure
 	(cd build; \
 	./configure --host=$(RUMPRUN_TOOLCHAIN_TUPLE) $(liblibressl_CONF_OPTS);)

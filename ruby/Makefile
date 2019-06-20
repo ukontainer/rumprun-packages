@@ -15,7 +15,7 @@ bin/ruby: build/rubydist/usr/bin/ruby
 
 build/rubydist/usr/bin/ruby: build/Makefile
 	(cd build; \
-	./configure --enable-static --disable-shared --host=$(RUMPRUN_TOOLCHAIN_TUPLE) --build=x86_64-unknown-linux --with-static-linked-ext --prefix=/usr --disable-install-doc --with-out-ext=-test* LDFLAGS="-Bstatic -static"; \
+	./configure --enable-static --disable-shared --host=$(RUMPRUN_TOOLCHAIN_TUPLE) --build=x86_64-unknown-linux --with-static-linked-ext --prefix=/usr --disable-install-doc --with-out-ext=-test* LDFLAGS="-Bstatic -static" CC=$(RUMPRUN_CC); \
 	$(MAKE) --debug; make install DESTDIR=rubydist)
 
 build/Makefile:

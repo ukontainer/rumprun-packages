@@ -12,7 +12,8 @@ build/libsqlite3.a: build/Makefile
 
 SQLITE_CONF_OPTS += \
 	--prefix=$(RUMPRUN_PKGS_DIR) \
-	--disable-shared
+	--disable-shared \
+	CC=$(RUMPRUN_CC)
 
 build/Makefile: build/configure
 	(cd build; \

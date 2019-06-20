@@ -16,8 +16,9 @@ libcurl_CONF_OPTS += \
 	--with-ssl \
 	--with-zlib \
 	--enable-shared=no \
-	--build=x86_64-unknown-netbsd
-	
+	--build=x86_64-unknown-netbsd \
+	CC=$(RUMPRUN_CC)
+
 build/Makefile: build/configure
 	(cd build; \
 	./configure --host=$(RUMPRUN_TOOLCHAIN_TUPLE) $(libcurl_CONF_OPTS);)
