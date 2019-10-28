@@ -22,6 +22,42 @@ jobs:
   exclude:
     - os: osx
       arch: arm64
+    # broken: issue #106
+    - env: PACKAGE=mysql
+    # broken: issue #92
+    - env: PACKAGE=openmp
+    # Disabled, does not actually build anything interesting
+    - env: PACKAGE=roundcube
+    # Disabled, build takes several hours
+    - env: PACKAGE=rust
+    # for shorten tests
+    - env: PACKAGE=erlang
+    - env: PACKAGE=haproxy
+    - env: PACKAGE=hiawatha
+    - env: PACKAGE=leveldb
+    - env: PACKAGE=libcurl
+    - env: PACKAGE=libevent
+    - env: PACKAGE=libressl
+    - env: PACKAGE=libxml2
+    - env: PACKAGE=mathopd
+    - env: PACKAGE=memcached
+    - env: PACKAGE=mpg123
+    - env: PACKAGE=nanomsg
+    - env: PACKAGE=ngircd
+    - env: PACKAGE=pcre
+    - env: PACKAGE=php5
+    - env: PACKAGE=php7
+    - env: PACKAGE=ruby
+    - env: PACKAGE=sqlite
+    - env: PACKAGE=sqlite-bench
+    - env: PACKAGE=tor
+    - env: PACKAGE=apache2
+    - env: PACKAGE=libffi
+    - env: PACKAGE=openjdk8
+    - env: PACKAGE=ovs
+    - env: PACKAGE=zeromq
+    - env: PACKAGE=servus
+    - env: PACKAGE=zerobuf
   include:
     - stage: deploy
       script:
@@ -34,140 +70,96 @@ jobs:
 env:
   global:
     - PATH="/usr/lib/ccache:/opt/rump/bin:$PATH"
+    - RUMPKERNEL=linux
   matrix:
-          #     - PACKAGE=erlang RUMPKERNEL=netbsd
-          #     - PACKAGE=haproxy RUMPKERNEL=netbsd
-          #     - PACKAGE=hiawatha RUMPKERNEL=netbsd
-          #     - PACKAGE=leveldb RUMPKERNEL=netbsd
-          #     - PACKAGE=libcurl RUMPKERNEL=netbsd
-          #     - PACKAGE=libevent RUMPKERNEL=netbsd
-          #     - PACKAGE=libressl RUMPKERNEL=netbsd
-          #     - PACKAGE=libxml2 RUMPKERNEL=netbsd
-          #     - PACKAGE=mathopd RUMPKERNEL=netbsd
-          #     - PACKAGE=memcached RUMPKERNEL=netbsd
-          #     - PACKAGE=mpg123 RUMPKERNEL=netbsd
-          #   # broken: issue #106
-          #   #  - PACKAGE=mysql RUMPKERNEL=netbsd
-          #     - PACKAGE=nanomsg RUMPKERNEL=netbsd
-          #     - PACKAGE=netperf RUMPKERNEL=netbsd
-          #     - PACKAGE=nginx RUMPKERNEL=netbsd
-          #     - PACKAGE=ngircd RUMPKERNEL=netbsd
-          #     - PACKAGE=nodejs RUMPKERNEL=netbsd
-          #   # broken: issue #92
-          #   #  - PACKAGE=openmp RUMPKERNEL=netbsd
-          #     - PACKAGE=pcre RUMPKERNEL=netbsd
-          #     - PACKAGE=php5 RUMPKERNEL=netbsd
-          #     - PACKAGE=php7 RUMPKERNEL=netbsd
-          #     - PACKAGE=python3 RUMPKERNEL=netbsd
-          #     - PACKAGE=redis RUMPKERNEL=netbsd
-          #   # Disabled, does not actually build anything interesting
-          #   #  - PACKAGE=roundcube RUMPKERNEL=netbsd
-          #     - PACKAGE=ruby RUMPKERNEL=netbsd
-          #   # Disabled, build takes several hours
-          #   #  - PACKAGE=rust RUMPKERNEL=netbsd
-          #     - PACKAGE=sqlite RUMPKERNEL=netbsd
-          #     - PACKAGE=sqlite-bench RUMPKERNEL=netbsd
-          #     - PACKAGE=tor RUMPKERNEL=netbsd
-          #     - PACKAGE=apache2 RUMPKERNEL=netbsd
-          #     - PACKAGE=libffi RUMPKERNEL=netbsd
-          #     - PACKAGE=openjdk8 RUMPKERNEL=netbsd
-          #     - PACKAGE=ovs RUMPKERNEL=netbsd
-          #     - PACKAGE=zeromq RUMPKERNEL=netbsd
-          #     - PACKAGE=servus RUMPKERNEL=netbsd
-          #     - PACKAGE=zerobuf RUMPKERNEL=netbsd
-###    - PACKAGE=erlang RUMPKERNEL=linux
-###    - PACKAGE=haproxy RUMPKERNEL=linux
-###    - PACKAGE=hiawatha RUMPKERNEL=linux
-###    - PACKAGE=leveldb RUMPKERNEL=linux
-###    - PACKAGE=libcurl RUMPKERNEL=linux
-###    - PACKAGE=libevent RUMPKERNEL=linux
-###    - PACKAGE=libressl RUMPKERNEL=linux
-###    - PACKAGE=libxml2 RUMPKERNEL=linux
-###    - PACKAGE=mathopd RUMPKERNEL=linux
-###    - PACKAGE=memcached RUMPKERNEL=linux
-###    - PACKAGE=mpg123 RUMPKERNEL=linux
-###  # broken: issue #106
-###  #  - PACKAGE=mysql RUMPKERNEL=linux
-###    - PACKAGE=nanomsg RUMPKERNEL=linux
-    - PACKAGE=netperf RUMPKERNEL=linux
-    - PACKAGE=nginx RUMPKERNEL=linux
-###    - PACKAGE=ngircd RUMPKERNEL=linux
-    - PACKAGE=nodejs RUMPKERNEL=linux
-###  # broken: issue #92
-###  #  - PACKAGE=openmp RUMPKERNEL=linux
-###    - PACKAGE=pcre RUMPKERNEL=linux
-###    - PACKAGE=php5 RUMPKERNEL=linux
-###    - PACKAGE=php7 RUMPKERNEL=linux
-###  # no libz
-    - PACKAGE=python3 RUMPKERNEL=linux
-    - PACKAGE=redis RUMPKERNEL=linux
-###  # Disabled, does not actually build anything interesting
-###  #  - PACKAGE=roundcube RUMPKERNEL=linux
-###    - PACKAGE=ruby RUMPKERNEL=linux
-###  # Disabled, build takes several hours
-###  #  - PACKAGE=rust RUMPKERNEL=linux
-###    - PACKAGE=sqlite RUMPKERNEL=linux
-###    - PACKAGE=sqlite-bench RUMPKERNEL=linux
-###    - PACKAGE=tor RUMPKERNEL=linux
-###    - PACKAGE=apache2 RUMPKERNEL=linux
-###    - PACKAGE=libffi RUMPKERNEL=linux
-###    - PACKAGE=openjdk8 RUMPKERNEL=linux
-###    - PACKAGE=ovs RUMPKERNEL=linux
-###    - PACKAGE=zeromq RUMPKERNEL=linux
-###    - PACKAGE=servus RUMPKERNEL=linux
-###    - PACKAGE=zerobuf RUMPKERNEL=linux
+    - PACKAGE=erlang
+    - PACKAGE=haproxy
+    - PACKAGE=hiawatha
+    - PACKAGE=leveldb
+    - PACKAGE=libcurl
+    - PACKAGE=libevent
+    - PACKAGE=libressl
+    - PACKAGE=libxml2
+    - PACKAGE=mathopd
+    - PACKAGE=memcached
+    - PACKAGE=mpg123
+    - PACKAGE=mysql
+    - PACKAGE=nanomsg
+    - PACKAGE=netperf
+    - PACKAGE=nginx
+    - PACKAGE=ngircd
+    - PACKAGE=nodejs
+    - PACKAGE=openmp
+    - PACKAGE=pcre
+    - PACKAGE=php5
+    - PACKAGE=php7
+    - PACKAGE=python3
+    - PACKAGE=redis
+    - PACKAGE=roundcube
+    - PACKAGE=ruby
+    - PACKAGE=rust
+    - PACKAGE=sqlite
+    - PACKAGE=sqlite-bench
+    - PACKAGE=tor
+    - PACKAGE=apache2
+    - PACKAGE=libffi
+    - PACKAGE=openjdk8
+    - PACKAGE=ovs
+    - PACKAGE=zeromq
+    - PACKAGE=servus
+    - PACKAGE=zerobuf
 
 matrix:
   allow_failures:
 # no crypto.a
-    - env: PACKAGE=erlang RUMPKERNEL=linux
+    - env: PACKAGE=erlang
 # no toolchain.cmake
-    - env: PACKAGE=hiawatha RUMPKERNEL=linux
+    - env: PACKAGE=hiawatha
 # no g++
-    - env: PACKAGE=leveldb RUMPKERNEL=linux
+    - env: PACKAGE=leveldb
 # no audio_info_t
-    - env: PACKAGE=mpg123 RUMPKERNEL=linux
+    - env: PACKAGE=mpg123
 # no Get_Error
-    - env: PACKAGE=ngircd RUMPKERNEL=linux
+    - env: PACKAGE=ngircd
 # no libz
-    - env: PACKAGE=php5 RUMPKERNEL=linux
+    - env: PACKAGE=php5
 # no libz
-    - env: PACKAGE=tor RUMPKERNEL=linux
+    - env: PACKAGE=tor
 # no same as netbsd (404)
-    - env: PACKAGE=apache2 RUMPKERNEL=linux
+    - env: PACKAGE=apache2
 # no g++
-    - env: PACKAGE=openjdk8 RUMPKERNEL=linux
+    - env: PACKAGE=openjdk8
 # no net/if_packet.h
-    - env: PACKAGE=ovs RUMPKERNEL=linux
+    - env: PACKAGE=ovs
 # no g++
-    - env: PACKAGE=zeromq RUMPKERNEL=linux
+    - env: PACKAGE=zeromq
 # no g++
-    - env: PACKAGE=servus RUMPKERNEL=linux
+    - env: PACKAGE=servus
 # no g++
-    - env: PACKAGE=zerobuf RUMPKERNEL=linux
+    - env: PACKAGE=zerobuf
 # osx (TO_BE_FIXED)
-    - env: PACKAGE=libevent RUMPKERNEL=linux
+    - env: PACKAGE=libevent
       os: osx
-    - env: PACKAGE=libressl RUMPKERNEL=linux
+    - env: PACKAGE=libressl
       os: osx
-    - env: PACKAGE=libxml2 RUMPKERNEL=linux
+    - env: PACKAGE=libxml2
       os: osx
-    - env: PACKAGE=mathopd RUMPKERNEL=linux
+    - env: PACKAGE=mathopd
       os: osx
-    - env: PACKAGE=memcached RUMPKERNEL=linux
+    - env: PACKAGE=memcached
       os: osx
-    - env: PACKAGE=php7 RUMPKERNEL=linux
+    - env: PACKAGE=php7
       os: osx
-    - env: PACKAGE=redis RUMPKERNEL=linux
+    - env: PACKAGE=redis
       os: osx
-    - env: PACKAGE=ruby RUMPKERNEL=linux
+    - env: PACKAGE=ruby
       os: osx
-    - env: PACKAGE=libffi RUMPKERNEL=linux
+    - env: PACKAGE=libffi
       os: osx
     # Unsupported CPU architecture
-    - env: PACKAGE=nodejs RUMPKERNEL=linux
+    - env: PACKAGE=nodejs
       arch: arm64
-    - env: PACKAGE=redis RUMPKERNEL=linux
+    - env: PACKAGE=redis
       arch: arm64
 
       # notifications:
