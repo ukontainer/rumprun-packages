@@ -4,9 +4,24 @@
 if [ $TRAVIS_OS_NAME == "linux" ] ; then
 sudo apt-get update
 sudo apt-get install makefs genisoimage
+if [ $TRAVIS_ARCH == "aarch64" ] ; then
+    sudo dpkg --add-architecture armhf
+    sudo apt-get update
+    sudo apt-get install libc6:armhf crossbuild-essential-armhf
+fi
 fi
 # XXX: take too long..
 #sudo apt-get install openjdk-7-jdk
+
+
+if [ $TRAVIS_ARCH == "amd64" ] ; then
+    export RUMPRUN_TOOLCHAIN_TUPLE=x86_64-rumprun-linux
+    export ARCH=amd64
+elif [ $TRAVIS_ARCH == "aarch64" ] ; then
+    export RUMPRUN_TOOLCHAIN_TUPLE=arm-rumprun-linux
+    export ARCH=arm
+fi
+
 
 # Build and install rumprun toolchain from source
 RUMPKERNEL=${RUMPKERNEL:-netbsd}
@@ -24,7 +39,7 @@ RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE:-x86_64-rumprun-${RUMPKERNEL}}
 echo RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE} >config.mk
 
 # copy pre-build rumprun toolchain
-curl -L https://dl.bintray.com/libos-nuse/x86_64-rumprun-linux/$TRAVIS_OS_NAME/frankenlibc.tar.gz \
+curl -L https://dl.bintray.com/ukontainer/ukontainer/$TRAVIS_OS_NAME/$ARCH/frankenlibc.tar.gz \
      -o /tmp/frankenlibc.tar.gz
 sudo mkdir -p /opt/rump && sudo chown $USER /opt/rump
 tar xfz /tmp/frankenlibc.tar.gz -C /

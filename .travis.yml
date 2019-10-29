@@ -1,5 +1,5 @@
 sudo: required
-dist: trusty
+dist: xenial
 language: generic
 cache:
   directories:
@@ -10,11 +10,18 @@ os:
   - osx
   - linux
 
+arch:
+  - amd64
+  - arm64
+
 stages:
   - test
   - deploy
 
 jobs:
+  exclude:
+    - os: osx
+      arch: arm64
   include:
     - stage: deploy
       script:
@@ -67,47 +74,47 @@ env:
           #     - PACKAGE=zeromq RUMPKERNEL=netbsd
           #     - PACKAGE=servus RUMPKERNEL=netbsd
           #     - PACKAGE=zerobuf RUMPKERNEL=netbsd
-    - PACKAGE=erlang RUMPKERNEL=linux
-    - PACKAGE=haproxy RUMPKERNEL=linux
-    - PACKAGE=hiawatha RUMPKERNEL=linux
-    - PACKAGE=leveldb RUMPKERNEL=linux
-    - PACKAGE=libcurl RUMPKERNEL=linux
-    - PACKAGE=libevent RUMPKERNEL=linux
-    - PACKAGE=libressl RUMPKERNEL=linux
-    - PACKAGE=libxml2 RUMPKERNEL=linux
-    - PACKAGE=mathopd RUMPKERNEL=linux
-    - PACKAGE=memcached RUMPKERNEL=linux
-    - PACKAGE=mpg123 RUMPKERNEL=linux
-  # broken: issue #106
-  #  - PACKAGE=mysql RUMPKERNEL=linux
-    - PACKAGE=nanomsg RUMPKERNEL=linux
+###    - PACKAGE=erlang RUMPKERNEL=linux
+###    - PACKAGE=haproxy RUMPKERNEL=linux
+###    - PACKAGE=hiawatha RUMPKERNEL=linux
+###    - PACKAGE=leveldb RUMPKERNEL=linux
+###    - PACKAGE=libcurl RUMPKERNEL=linux
+###    - PACKAGE=libevent RUMPKERNEL=linux
+###    - PACKAGE=libressl RUMPKERNEL=linux
+###    - PACKAGE=libxml2 RUMPKERNEL=linux
+###    - PACKAGE=mathopd RUMPKERNEL=linux
+###    - PACKAGE=memcached RUMPKERNEL=linux
+###    - PACKAGE=mpg123 RUMPKERNEL=linux
+###  # broken: issue #106
+###  #  - PACKAGE=mysql RUMPKERNEL=linux
+###    - PACKAGE=nanomsg RUMPKERNEL=linux
     - PACKAGE=netperf RUMPKERNEL=linux
     - PACKAGE=nginx RUMPKERNEL=linux
-    - PACKAGE=ngircd RUMPKERNEL=linux
+###    - PACKAGE=ngircd RUMPKERNEL=linux
     - PACKAGE=nodejs RUMPKERNEL=linux
-  # broken: issue #92
-  #  - PACKAGE=openmp RUMPKERNEL=linux
-    - PACKAGE=pcre RUMPKERNEL=linux
-    - PACKAGE=php5 RUMPKERNEL=linux
-    - PACKAGE=php7 RUMPKERNEL=linux
-  # no libz
+###  # broken: issue #92
+###  #  - PACKAGE=openmp RUMPKERNEL=linux
+###    - PACKAGE=pcre RUMPKERNEL=linux
+###    - PACKAGE=php5 RUMPKERNEL=linux
+###    - PACKAGE=php7 RUMPKERNEL=linux
+###  # no libz
     - PACKAGE=python3 RUMPKERNEL=linux
     - PACKAGE=redis RUMPKERNEL=linux
-  # Disabled, does not actually build anything interesting
-  #  - PACKAGE=roundcube RUMPKERNEL=linux
-    - PACKAGE=ruby RUMPKERNEL=linux
-  # Disabled, build takes several hours
-  #  - PACKAGE=rust RUMPKERNEL=linux
-    - PACKAGE=sqlite RUMPKERNEL=linux
-    - PACKAGE=sqlite-bench RUMPKERNEL=linux
-    - PACKAGE=tor RUMPKERNEL=linux
-    - PACKAGE=apache2 RUMPKERNEL=linux
-    - PACKAGE=libffi RUMPKERNEL=linux
-    - PACKAGE=openjdk8 RUMPKERNEL=linux
-    - PACKAGE=ovs RUMPKERNEL=linux
-    - PACKAGE=zeromq RUMPKERNEL=linux
-    - PACKAGE=servus RUMPKERNEL=linux
-    - PACKAGE=zerobuf RUMPKERNEL=linux
+###  # Disabled, does not actually build anything interesting
+###  #  - PACKAGE=roundcube RUMPKERNEL=linux
+###    - PACKAGE=ruby RUMPKERNEL=linux
+###  # Disabled, build takes several hours
+###  #  - PACKAGE=rust RUMPKERNEL=linux
+###    - PACKAGE=sqlite RUMPKERNEL=linux
+###    - PACKAGE=sqlite-bench RUMPKERNEL=linux
+###    - PACKAGE=tor RUMPKERNEL=linux
+###    - PACKAGE=apache2 RUMPKERNEL=linux
+###    - PACKAGE=libffi RUMPKERNEL=linux
+###    - PACKAGE=openjdk8 RUMPKERNEL=linux
+###    - PACKAGE=ovs RUMPKERNEL=linux
+###    - PACKAGE=zeromq RUMPKERNEL=linux
+###    - PACKAGE=servus RUMPKERNEL=linux
+###    - PACKAGE=zerobuf RUMPKERNEL=linux
 
 matrix:
   allow_failures:
@@ -156,8 +163,12 @@ matrix:
       os: osx
     - env: PACKAGE=libffi RUMPKERNEL=linux
       os: osx
+    # Unsupported CPU architecture
+    - env: PACKAGE=nodejs RUMPKERNEL=linux
+      arch: arm64
+    - env: PACKAGE=redis RUMPKERNEL=linux
+      arch: arm64
 
- 
       # notifications:
       #   irc:
       #     channels:
