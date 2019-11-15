@@ -12,6 +12,11 @@ else
 	make -j2
 fi
 
+if [ $TRAVIS_ARCH == "amd64" ] ; then
+    export ARCH=amd64
+elif [ $TRAVIS_ARCH == "aarch64" ] ; then
+    export ARCH=arm
+fi
 
 if [ "${PACKAGE}" == "nginx" ]; then
 	curl -T bin/nginx -u$BINTRAY_USER:$BINTRAY_APIKEY \
