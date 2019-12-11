@@ -59,7 +59,6 @@ jobs:
     - env: PACKAGE=php7
     - env: PACKAGE=ruby
     - env: PACKAGE=sqlite
-    - env: PACKAGE=sqlite-bench
     - env: PACKAGE=tor
     - env: PACKAGE=apache2
     - env: PACKAGE=libffi
