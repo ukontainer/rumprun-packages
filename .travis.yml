@@ -1,6 +1,7 @@
 sudo: required
 dist: xenial
 language: generic
+filter_secrets: false
 cache:
   directories:
     - $HOME/.ccache
