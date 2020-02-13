@@ -1,4 +1,3 @@
-sudo: required
 dist: xenial
 language: generic
 filter_secrets: false
@@ -67,50 +66,6 @@ jobs:
       os: linux
       dist: trusty  # XXX: docker multi-arch image requires 17.09(dockerd):18.06(docker)
       env: RUMPKERNEL=linux
-
-env:
-  global:
-    - PATH="/usr/lib/ccache:/opt/rump/bin:$PATH"
-    - RUMPKERNEL=linux
-  matrix:
-    - PACKAGE=erlang
-    - PACKAGE=haproxy
-    - PACKAGE=hiawatha
-    - PACKAGE=leveldb
-    - PACKAGE=libcurl
-    - PACKAGE=libevent
-    - PACKAGE=libressl
-    - PACKAGE=libxml2
-    - PACKAGE=mathopd
-    - PACKAGE=memcached
-    - PACKAGE=mpg123
-    - PACKAGE=mysql
-    - PACKAGE=nanomsg
-    - PACKAGE=netperf
-    - PACKAGE=nginx
-    - PACKAGE=ngircd
-    - PACKAGE=nodejs
-    - PACKAGE=openmp
-    - PACKAGE=pcre
-    - PACKAGE=php5
-    - PACKAGE=php7
-    - PACKAGE=python3
-    - PACKAGE=redis
-    - PACKAGE=roundcube
-    - PACKAGE=ruby
-    - PACKAGE=rust
-    - PACKAGE=sqlite
-    - PACKAGE=sqlite-bench
-    - PACKAGE=tor
-    - PACKAGE=apache2
-    - PACKAGE=libffi
-    - PACKAGE=openjdk8
-    - PACKAGE=ovs
-    - PACKAGE=zeromq
-    - PACKAGE=servus
-    - PACKAGE=zerobuf
-
-matrix:
   allow_failures:
 # no crypto.a
     - env: PACKAGE=erlang
@@ -162,6 +117,49 @@ matrix:
       arch: arm64
     - env: PACKAGE=redis
       arch: arm64
+
+env:
+  global:
+    - PATH="/usr/lib/ccache:/opt/rump/bin:$PATH"
+    - RUMPKERNEL=linux
+  matrix:
+    - PACKAGE=erlang
+    - PACKAGE=haproxy
+    - PACKAGE=hiawatha
+    - PACKAGE=leveldb
+    - PACKAGE=libcurl
+    - PACKAGE=libevent
+    - PACKAGE=libressl
+    - PACKAGE=libxml2
+    - PACKAGE=mathopd
+    - PACKAGE=memcached
+    - PACKAGE=mpg123
+    - PACKAGE=mysql
+    - PACKAGE=nanomsg
+    - PACKAGE=netperf
+    - PACKAGE=nginx
+    - PACKAGE=ngircd
+    - PACKAGE=nodejs
+    - PACKAGE=openmp
+    - PACKAGE=pcre
+    - PACKAGE=php5
+    - PACKAGE=php7
+    - PACKAGE=python3
+    - PACKAGE=redis
+    - PACKAGE=roundcube
+    - PACKAGE=ruby
+    - PACKAGE=rust
+    - PACKAGE=sqlite
+    - PACKAGE=sqlite-bench
+    - PACKAGE=tor
+    - PACKAGE=apache2
+    - PACKAGE=libffi
+    - PACKAGE=openjdk8
+    - PACKAGE=ovs
+    - PACKAGE=zeromq
+    - PACKAGE=servus
+    - PACKAGE=zerobuf
+
 
       # notifications:
       #   irc:
