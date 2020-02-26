@@ -90,7 +90,7 @@ build/Makefile: build/stamp_patch
 
 images/python.iso: build/python$(EXESUFFIX)
 	mkdir -p images
-	$(RUMPRUN_GENISOIMAGE) -o images/python.iso build/pythondist/lib/python3.5
+	$(RUMPRUN_GENISOIMAGE) -o images/python.iso build/pythondist/lib/
 
 images/python.img: build/python$(EXESUFFIX)
 	mkdir -p images

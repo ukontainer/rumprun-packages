@@ -1,7 +1,7 @@
 #!/bin/bash
 # build additional packages to be deployed
 
-VERSION=0.2
+VERSION=0.3
 
 deploy() {
 git clone -q https://github.com/thehajime/runu-base.git
@@ -67,7 +67,10 @@ git clone -q https://github.com/thehajime/runu-base.git
 
        if [ "$NAME" = "python" ] ; then
 	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/linux/amd64/python.img -o imgs/python.img
+		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/python.iso -o /tmp/python.iso
+	   mkdir -p usr/lib/
+	   7z x -ousr/lib /tmp/python.iso
+	   DOCKER_FILE=Dockerfile.python
        elif [ "$NAME" = "nginx" ] ; then
 	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
 		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/data.iso -o imgs/data.iso
@@ -81,7 +84,7 @@ git clone -q https://github.com/thehajime/runu-base.git
        ls -lR .
        # push an image to docker hub
        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-       docker build -t $DOCKER_USERNAME/runu-$NAME:$VERSION-$OS-$ARCH .
+       docker build -f ${DOCKER_FILE:-Dockerfile} -t $DOCKER_USERNAME/runu-$NAME:$VERSION-$OS-$ARCH .
        docker images
        docker push $DOCKER_USERNAME/runu-$NAME:$VERSION-$OS-$ARCH
 
@@ -116,6 +119,9 @@ create_multi_arch_image() {
 			  >> $HOME/docker-manifest.log
 }
 
+# pre-deploy
+sudo apt-get update
+sudo apt-get install p7zip-full
 
 # obtain newer docker command
 curl -fsSL  curl -O https://download.docker.com/linux/static/stable/x86_64/docker-18.06.1-ce.tgz \
