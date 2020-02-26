@@ -1,0 +1,11 @@
+--- a/Lib/platform.py.orig	2020-02-21 13:53:12.545794666 +0900
++++ b/Lib/platform.py	2020-02-21 13:53:14.400795697 +0900
+@@ -965,7 +965,7 @@
+     if _uname_cache is not None:
+         return _uname_cache
+ 
+-    processor = ''
++    processor = 'lkl'
+ 
+     # Get some infos from the builtin os.uname API...
+     try:
