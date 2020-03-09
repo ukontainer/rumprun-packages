@@ -61,7 +61,7 @@ jobs:
   include:
     - stage: deploy
       script:
-        - bash -ex ./.travis-deploy-docker.sh
+        - bash -e ./.travis-deploy-docker.sh
         - bash -ex ./.travis-trigger.sh ukontainer/runu
       os: linux
       dist: trusty  # XXX: docker multi-arch image requires 17.09(dockerd):18.06(docker)
