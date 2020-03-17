@@ -4,7 +4,7 @@ filter_secrets: false
 cache:
   directories:
     - $HOME/.ccache
-script: bash -ex ./.travis-install.sh && bash -ex ./.travis-script.sh
+script: bash -ex ./.travis-install.sh && bash -e ./.travis-script.sh
 
 os:
   - osx
@@ -62,7 +62,7 @@ jobs:
     - stage: deploy
       script:
         - bash -e ./.travis-deploy-docker.sh
-        - bash -ex ./.travis-trigger.sh ukontainer/runu
+        - bash -e ./.travis-trigger.sh ukontainer/runu
       os: linux
       dist: trusty  # XXX: docker multi-arch image requires 17.09(dockerd):18.06(docker)
       env: RUMPKERNEL=linux

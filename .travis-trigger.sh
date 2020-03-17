@@ -9,7 +9,7 @@
 # $ travis login
 # $ travis token
 #
-set -x
+#set -x
 
 if [ -z "${TRAVIS_TOKEN}" ]; then
     echo Error: Set TRAVIS_TOKEN before calling this script 1>&2
