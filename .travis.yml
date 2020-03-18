@@ -1,9 +1,9 @@
 dist: xenial
-language: generic
+language: c
 filter_secrets: false
 cache:
-  directories:
-    - $HOME/.ccache
+  - ccache
+  - apt
 script: bash -ex ./.travis-install.sh && bash -e ./.travis-script.sh
 
 os:
@@ -120,7 +120,7 @@ jobs:
 
 env:
   global:
-    - PATH="/usr/lib/ccache:/opt/rump/bin:$PATH"
+    - PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:/opt/rump/bin:$PATH"
     - RUMPKERNEL=linux
   matrix:
     - PACKAGE=erlang

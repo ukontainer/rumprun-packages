@@ -12,7 +12,7 @@ fi
 fi
 
 if [ $TRAVIS_OS_NAME == "osx" ] ; then
-HOMEBREW_NO_AUTO_UPDATE=1 brew install e2fsprogs
+HOMEBREW_NO_AUTO_UPDATE=1 brew install e2fsprogs ccache
 ln -sf /usr/local/opt/e2fsprogs/sbin/mkfs.ext2 /usr/local/bin/
 fi
 
