@@ -10,6 +10,12 @@ if [ $TRAVIS_ARCH == "aarch64" ] ; then
     sudo apt-get install libc6:armhf crossbuild-essential-armhf
 fi
 fi
+
+if [ $TRAVIS_OS_NAME == "osx" ] ; then
+HOMEBREW_NO_AUTO_UPDATE=1 brew install e2fsprogs
+ln -sf /usr/local/opt/e2fsprogs/sbin/mkfs.ext2 /usr/local/bin/
+fi
+
 # XXX: take too long..
 #sudo apt-get install openjdk-7-jdk
 
