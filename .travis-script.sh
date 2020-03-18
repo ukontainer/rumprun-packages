@@ -9,13 +9,14 @@ cd ${PACKAGE}
 if [ "${PACKAGE}" == "openjdk8" ]; then
 	make
 else
-	make -j2
+	# XXX: redis uses ${ARCH} in Makefile
+	ARCH="" make -j2
 fi
 
 if [ $TRAVIS_ARCH == "amd64" ] ; then
     export ARCH=amd64
 elif [ $TRAVIS_ARCH == "aarch64" ] ; then
-    export ARCH=arm
+    export ARCH=${ARCH:-arm64}
 fi
 
 if [ "${PACKAGE}" == "nginx" ]; then

@@ -24,8 +24,8 @@ if [ $TRAVIS_ARCH == "amd64" ] ; then
     export RUMPRUN_TOOLCHAIN_TUPLE=x86_64-rumprun-linux
     export ARCH=amd64
 elif [ $TRAVIS_ARCH == "aarch64" ] ; then
-    export RUMPRUN_TOOLCHAIN_TUPLE=arm-rumprun-linux
-    export ARCH=arm
+    export RUMPRUN_TOOLCHAIN_TUPLE=${RUMPRUN_TOOLCHAIN_TUPLE:-aarch64-rumprun-${RUMPKERNEL}}
+    export ARCH=${ARCH:-arm64}
 fi
 
 

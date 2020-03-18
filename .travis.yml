@@ -4,7 +4,17 @@ filter_secrets: false
 cache:
   - ccache
   - apt
-script: bash -ex ./.travis-install.sh && bash -e ./.travis-script.sh
+before_script:
+  - export -f travis_fold
+script:
+  - travis_fold start "build"
+  - bash -e ./.travis-install.sh && bash -e ./.travis-script.sh
+  - travis_fold end "build"
+  # Add arm(32) build only for linux/arm64 instance
+  - travis_fold start "build.arm32"
+  - git clean -dfx
+  - if [ $TRAVIS_ARCH == "aarch64" ] && [ $TRAVIS_OS_NAME == "linux" ] ; then ARCH=arm RUMPRUN_TOOLCHAIN_TUPLE=arm-rumprun-linux bash -e ./.travis-install.sh ; ARCH=arm bash -e ./.travis-script.sh ; fi
+  - travis_fold end "build.arm32"
 
 os:
   - osx
@@ -67,33 +77,33 @@ jobs:
       dist: trusty  # XXX: docker multi-arch image requires 17.09(dockerd):18.06(docker)
       env: RUMPKERNEL=linux
   allow_failures:
-# no crypto.a
+    # no crypto.a
     - env: PACKAGE=erlang
-# no toolchain.cmake
+    # no toolchain.cmake
     - env: PACKAGE=hiawatha
-# no g++
+    # no g++
     - env: PACKAGE=leveldb
-# no audio_info_t
+    # no audio_info_t
     - env: PACKAGE=mpg123
-# no Get_Error
+    # no Get_Error
     - env: PACKAGE=ngircd
-# no libz
+    # no libz
     - env: PACKAGE=php5
-# no libz
+    # no libz
     - env: PACKAGE=tor
-# no same as netbsd (404)
+    # no same as netbsd (404)
     - env: PACKAGE=apache2
-# no g++
+    # no g++
     - env: PACKAGE=openjdk8
-# no net/if_packet.h
+    # no net/if_packet.h
     - env: PACKAGE=ovs
-# no g++
+    # no g++
     - env: PACKAGE=zeromq
-# no g++
+    # no g++
     - env: PACKAGE=servus
-# no g++
+    # no g++
     - env: PACKAGE=zerobuf
-# osx (TO_BE_FIXED)
+    # osx (TO_BE_FIXED)
     - env: PACKAGE=libevent
       os: osx
     - env: PACKAGE=libressl
@@ -106,8 +116,6 @@ jobs:
       os: osx
     - env: PACKAGE=php7
       os: osx
-    - env: PACKAGE=redis
-      os: osx
     - env: PACKAGE=ruby
       os: osx
     - env: PACKAGE=libffi
@@ -115,14 +123,12 @@ jobs:
     # Unsupported CPU architecture
     - env: PACKAGE=nodejs
       arch: arm64
-    - env: PACKAGE=redis
-      arch: arm64
 
 env:
   global:
     - PATH="/usr/lib/ccache:/usr/local/opt/ccache/libexec:/opt/rump/bin:$PATH"
     - RUMPKERNEL=linux
-  matrix:
+  jobs:
     - PACKAGE=erlang
     - PACKAGE=haproxy
     - PACKAGE=hiawatha

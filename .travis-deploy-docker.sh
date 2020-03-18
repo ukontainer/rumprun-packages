@@ -100,6 +100,7 @@ create_multi_arch_image() {
        /tmp/docker/docker -D manifest create $DOCKER_USERNAME/$name:$VERSION \
 			  $DOCKER_USERNAME/$name:$VERSION-osx-amd64 \
 			  $DOCKER_USERNAME/$name:$VERSION-linux-amd64 \
+			  $DOCKER_USERNAME/$name:$VERSION-linux-arm64  \
 			  $DOCKER_USERNAME/$name:$VERSION-linux-arm
 
        /tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/$name:$VERSION \
@@ -108,6 +109,9 @@ create_multi_arch_image() {
        /tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/$name:$VERSION \
 			  $DOCKER_USERNAME/$name:$VERSION-linux-amd64 \
 			  --os linux --arch amd64
+       /tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/$name:$VERSION \
+			  $DOCKER_USERNAME/$name:$VERSION-linux-arm64 \
+			  --os linux --arch arm64
        /tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/$name:$VERSION \
 			  $DOCKER_USERNAME/$name:$VERSION-linux-arm \
 			  --os linux --arch arm
@@ -130,7 +134,7 @@ tar xfz /tmp/docker-18.06.1-ce.tgz -C /tmp/
 chmod +x /tmp/docker/docker
 
 # create images
-OS_ARCH_MTX=("linux amd64" "linux arm" "osx amd64")
+OS_ARCH_MTX=("linux amd64" "linux arm" "linux arm64" "osx amd64")
 PKGS="node python netperf nginx sqlite_bench"
 
 for i in "${OS_ARCH_MTX[@]}"
