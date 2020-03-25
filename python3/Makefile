@@ -6,12 +6,12 @@ ARCH=$(shell $(HOST_CC) -dumpmachine)
 
 ifeq ($(shell uname),Linux)
 ifeq ($(shell arch),aarch64)
-all: libssl $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a images/python.iso
+all: libssl $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a libz images/python.iso
 else
-all: libssl $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a images/python.iso images/python.img
+all: libssl $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a libz images/python.iso images/python.img
 endif
 else
-all: $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a images/python.iso
+all: $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a libz images/python.iso
 endif
 
 ifeq ($(shell uname),Darwin)
@@ -95,7 +95,7 @@ images/python.iso: build/python$(EXESUFFIX)
 images/python.img: build/python$(EXESUFFIX)
 	mkdir -p images
 	mkdir -p mnt
-	dd if=/dev/zero of=images/python.img bs=1M count=70
+	dd if=/dev/zero of=images/python.img bs=1M count=80
 	mkfs.ext4 -F images/python.img
 	sudo mount -o loop images/python.img mnt
 	sudo mkdir -p mnt/python/lib
