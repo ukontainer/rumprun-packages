@@ -1,6 +1,11 @@
-.NOTPARALLEL: $(RUMPRUN_PKGS_DIR)/lib/libssl.a
+.NOTPARALLEL: $(RUMPRUN_PKGS_DIR)/lib/libssl.a $(RUMPRUN_PKGS_DIR)/lib/libz.a
 $(RUMPRUN_PKGS_DIR)/lib/libssl.a:
 	$(MAKE) -C ../$(RUMPRUN_SSL)
 
-.PHONY: libssl
+$(RUMPRUN_PKGS_DIR)/lib/libz.a:
+	$(MAKE) -C ../zlib
+
+
+.PHONY: libssl libz
 libssl: $(RUMPRUN_PKGS_DIR)/lib/libssl.a
+libz: $(RUMPRUN_PKGS_DIR)/lib/libz.a

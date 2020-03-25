@@ -165,6 +165,7 @@ env:
     - PACKAGE=zeromq
     - PACKAGE=servus
     - PACKAGE=zerobuf
+    - PACKAGE=zlib
 
 
       # notifications:
