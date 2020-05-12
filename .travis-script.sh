@@ -19,42 +19,54 @@ elif [ $TRAVIS_ARCH == "aarch64" ] ; then
     export ARCH=${ARCH:-arm64}
 fi
 
-if [ "${PACKAGE}" == "nginx" ]; then
-	curl -T bin/nginx -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/nginx;override=1&publish=1"
-	curl -T images/data.iso -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	      "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/data.iso;override=1&publish=1"
-fi
 
-if [ "${PACKAGE}" == "python3" ]; then
-	if [ "$TRAVIS_OS_NAME" == "osx" ]; then
-		EXESUFFIX=.exe
+
+BINARY=(
+    "nginx nginx"
+    "python3 python"
+    "netperf netperf"
+    "sqlite-bench sqlite-bench"
+    "nodejs node"
+)
+upload_to_bintray(){
+	local bin=""
+	for i in "${BINARY[@]}"
+	do
+		pkg_bin=(${i[@]})
+		pkg=${pkg_bin[0]}
+		if [ "$pkg" == "${PACKAGE}" ] ; then
+			bin=${pkg_bin[1]}
+			break
+		fi
+	done
+	if [ -z "$bin" ] ; then
+		return
+	fi
+	echo "==== copying $bin ===="
+
+	curl -T bin/$bin -u$BINTRAY_USER:$BINTRAY_APIKEY \
+	       "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/$bin;override=1&publish=1"
+
+	# additional installation
+	if [ "${PACKAGE}" == "nginx" ]; then
+	    curl -T images/data.iso -u$BINTRAY_USER:$BINTRAY_APIKEY \
+		 "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/data.iso;override=1&publish=1"
 	fi
 
-	curl -T build/python$EXESUFFIX -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/python;override=1&publish=1"
-	if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_ARCH" == "amd64" ]; then
-	  curl -T images/python.img -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	      "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/python.img;override=1&publish=1"
+	if [ "${PACKAGE}" == "python3" ]; then
+		if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_ARCH" == "amd64" ]; then
+			curl -T images/python.img -u$BINTRAY_USER:$BINTRAY_APIKEY \
+			     "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/python.img;override=1&publish=1"
+		fi
+
+		curl -T images/python.iso -u$BINTRAY_USER:$BINTRAY_APIKEY \
+		     "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/python.iso;override=1&publish=1"
 	fi
- 
-	curl -T images/python.iso -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	      "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/python.iso;override=1&publish=1"
-fi
 
-if [ "${PACKAGE}" == "netperf" ]; then
-	curl -T build/src/netperf -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/netperf;override=1&publish=1"
-	curl -T build/src/netserver -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	      "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/netserver;override=1&publish=1"
-fi
+	if [ "${PACKAGE}" == "netperf" ]; then
+	    curl -T build/src/netserver -u$BINTRAY_USER:$BINTRAY_APIKEY \
+		 "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/netserver;override=1&publish=1"
+	fi
+}
 
-if [ "${PACKAGE}" == "sqlite-bench" ]; then
-	curl -T bin/sqlite-bench -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/sqlite-bench;override=1&publish=1"
-fi
-
-if [ "${PACKAGE}" == "nodejs" ]; then
-	curl -T bin/node -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/node;override=1&publish=1"
-fi
+upload_to_bintray
