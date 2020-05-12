@@ -12,8 +12,9 @@ fi
 fi
 
 if [ $TRAVIS_OS_NAME == "osx" ] ; then
-HOMEBREW_NO_AUTO_UPDATE=1 brew install e2fsprogs ccache
+HOMEBREW_NO_AUTO_UPDATE=1 brew install e2fsprogs ccache gnu-sed
 ln -sf /usr/local/opt/e2fsprogs/sbin/mkfs.ext2 /usr/local/bin/
+ln -sf /usr/local/bin/gsed /usr/local/bin/sed
 fi
 
 # XXX: take too long..

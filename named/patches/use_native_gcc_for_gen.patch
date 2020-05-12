@@ -1,0 +1,19 @@
+diff --git a/lib/dns/Makefile.in b/lib/dns/Makefile.in
+index 732ab3c719..de590127af 100644
+--- a/lib/dns/Makefile.in
++++ b/lib/dns/Makefile.in
+@@ -183,10 +183,12 @@ include/dns/rdatastruct.h: gen \
+ code.h:	gen
+ 	./gen -s ${srcdir} > code.h || { rm -f $@ ; exit 1; }
+ 
++gen: TMP_BUILD_CC = gcc
++gen: TMP_BUILD_LDFLAGS = $(filter-out -static, ${BUILD_LDFLAGS})
+ gen: gen.c
+-	${BUILD_CC} ${BUILD_CFLAGS} -I${top_srcdir}/lib/isc/include \
++	${TMP_BUILD_CC} ${BUILD_CFLAGS} -I${top_srcdir}/lib/isc/include \
+ 	${LFS_CFLAGS} ${LFS_LDFLAGS} \
+-	${BUILD_CPPFLAGS} ${BUILD_LDFLAGS} -o $@ ${srcdir}/gen.c \
++	${BUILD_CPPFLAGS} ${TMP_BUILD_LDFLAGS} -o $@ ${srcdir}/gen.c \
+ 	${BUILD_LIBS} ${LFS_LIBS}
+ 
+ timestamp: include libdns.@A@

@@ -1,0 +1,27 @@
+diff --git a/Makefile.in b/Makefile.in
+index 9b3d12d861..a6547a90da 100644
+--- a/Makefile.in
++++ b/Makefile.in
+@@ -14,7 +14,7 @@ top_builddir =  @top_builddir@
+ 
+ VERSION=@BIND9_VERSION@
+ 
+-SUBDIRS =	make lib bin doc
++SUBDIRS =	make lib bin
+ TARGETS =
+ PREREQS =	bind.keys.h
+ 
+diff --git a/bin/Makefile.in b/bin/Makefile.in
+index f0c504a17e..bffe360c29 100644
+--- a/bin/Makefile.in
++++ b/bin/Makefile.in
+@@ -11,8 +11,7 @@ srcdir =	@srcdir@
+ VPATH =		@srcdir@
+ top_srcdir =	@top_srcdir@
+ 
+-SUBDIRS =	named rndc dig delv dnssec tools nsupdate check confgen \
+-		@NZD_TOOLS@ @PYTHON_TOOLS@ @PKCS11_TOOLS@ tests
++SUBDIRS =	named
+ TARGETS =
+ 
+ @BIND9_MAKE_RULES@
