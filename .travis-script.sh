@@ -27,6 +27,7 @@ BINARY=(
     "netperf netperf"
     "sqlite-bench sqlite-bench"
     "nodejs node"
+    "named named"
 )
 upload_to_bintray(){
 	local bin=""
@@ -66,6 +67,13 @@ upload_to_bintray(){
 	if [ "${PACKAGE}" == "netperf" ]; then
 	    curl -T build/src/netserver -u$BINTRAY_USER:$BINTRAY_APIKEY \
 		 "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/netserver;override=1&publish=1"
+	fi
+
+	if [ "${PACKAGE}" == "named" ]; then
+		if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_ARCH" == "amd64" ]; then
+			curl -T images/named.img -u$BINTRAY_USER:$BINTRAY_APIKEY \
+				"https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/named.img;override=1&publish=1"
+		fi
 	fi
 }
 

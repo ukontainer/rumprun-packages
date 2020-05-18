@@ -77,6 +77,9 @@ git clone -q https://github.com/thehajime/runu-base.git
        elif [ "$NAME" = "netperf" ] ; then
 	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
 		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/netserver -o bin/netserver
+       elif [ "$NAME" = "named" ] ; then
+	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
+		https://dl.bintray.com/ukontainer/ukontainer/linux/amd64/named.img -o imgs/named.img
        fi
 
        chmod +x bin/*
@@ -135,7 +138,7 @@ chmod +x /tmp/docker/docker
 
 # create images
 OS_ARCH_MTX=("linux amd64" "linux arm" "linux arm64" "osx amd64")
-PKGS="node python netperf nginx sqlite_bench"
+PKGS="node python netperf nginx sqlite_bench named"
 
 for i in "${OS_ARCH_MTX[@]}"
 do
