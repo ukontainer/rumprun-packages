@@ -10,3 +10,4 @@ $TTL 3600 ; 1 hour
 @ IN NS ns.hoge.local.
 host IN A 172.18.0.1
 ns IN A  172.18.0.2
+ns IN AAAA dead:beaf::

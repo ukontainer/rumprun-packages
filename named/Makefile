@@ -26,7 +26,7 @@ NAMED_CONF_OPTS += \
 	--disable-rpz-nsip \
 	--disable-rpz-nsdname \
 	--disable-threads \
-	--disable-ipv6 \
+	--enable-ipv6 \
 	--disable-backtrace \
 	--disable-symtable \
 	--enable-full-report \
