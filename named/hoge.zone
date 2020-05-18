@@ -1,0 +1,13 @@
+$ORIGIN hoge.local.
+$TTL 3600 ; 1 hour
+@ IN SOA ns.hoge.local. postmaster.hoge.local. (
+    2009082401 ; serial
+    3600 ; refresh (1 hour)
+    1200 ; retry (20 min.)
+    1209600 ; expire (2 weeks)
+    900 ; minimum (15 min.)
+)
+@ IN NS ns.hoge.local.
+host IN A 172.18.0.1
+ns IN A  172.18.0.2
+ns IN AAAA dead:beaf::

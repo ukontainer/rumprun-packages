@@ -23,6 +23,10 @@ endif
 $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a:
 	$(MAKE) -C ../sqlite
 
+bin/python: build/python$(EXESUFFIX)
+	mkdir -p bin
+	cp $< $@
+
 build/python$(EXESUFFIX): build/Makefile
 	$(MAKE) -C build
 	$(MAKE) -C build install
@@ -88,11 +92,11 @@ endif
 build/Makefile: build/stamp_patch
 	(cd build; $(PYTHON_CONF_ENV) ./configure $(PYTHON_CONF_OPTS))
 
-images/python.iso: build/python$(EXESUFFIX)
+images/python.iso: bin/python
 	mkdir -p images
 	$(RUMPRUN_GENISOIMAGE) -o images/python.iso build/pythondist/lib/
 
-images/python.img: build/python$(EXESUFFIX)
+images/python.img: bin/python
 	mkdir -p images
 	mkdir -p mnt
 	dd if=/dev/zero of=images/python.img bs=1M count=80
