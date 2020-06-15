@@ -21,6 +21,8 @@ git clone -q https://github.com/thehajime/runu-base.git
        curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
 	    https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/netserver -o bin/netserver
        curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
+	    https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/named -o bin/named
+       curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
 	    https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/sqlite-bench -o bin/sqlite-bench
 
        # copy rootfs images
@@ -30,6 +32,8 @@ git clone -q https://github.com/thehajime/runu-base.git
 	    https://dl.bintray.com/ukontainer/ukontainer/linux/amd64/python.img -o imgs/python.img
        curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
 	    https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/python.iso -o imgs/python.iso
+       curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
+	    https://dl.bintray.com/ukontainer/ukontainer/linux/amd64/named.img -o imgs/named.img
 
        curl -L https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/frankenlibc.tar.gz \
 	    -o /tmp/frankenlibc.tar.gz
@@ -78,8 +82,10 @@ git clone -q https://github.com/thehajime/runu-base.git
 	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
 		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/netserver -o bin/netserver
        elif [ "$NAME" = "named" ] ; then
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/linux/amd64/named.img -o imgs/named.img
+	   mkdir -p ./etc/bind/
+	   cp $TRAVIS_BUILD_DIR/named/Dockerfile ./
+	   cp $TRAVIS_BUILD_DIR/named/named.conf ./etc/bind/
+	   cp $TRAVIS_BUILD_DIR/named/*.zone ./etc/bind/
        fi
 
        chmod +x bin/*
