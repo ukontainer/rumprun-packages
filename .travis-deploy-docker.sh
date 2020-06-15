@@ -70,7 +70,7 @@ git clone -q https://github.com/thehajime/runu-base.git
 		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/python.iso -o /tmp/python.iso
 	   mkdir -p usr/lib/
 	   7z x -ousr/lib /tmp/python.iso
-	   DOCKER_FILE=Dockerfile.python
+	   cp $TRAVIS_BUILD_DIR/python3/Dockerfile ./
        elif [ "$NAME" = "nginx" ] ; then
 	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
 		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/data.iso -o imgs/data.iso
@@ -87,7 +87,7 @@ git clone -q https://github.com/thehajime/runu-base.git
        ls -lR .
        # push an image to docker hub
        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-       docker build -f ${DOCKER_FILE:-Dockerfile} -t $DOCKER_USERNAME/runu-$NAME:$VERSION-$OS-$ARCH .
+       docker build -f Dockerfile -t $DOCKER_USERNAME/runu-$NAME:$VERSION-$OS-$ARCH .
        docker images
        docker push $DOCKER_USERNAME/runu-$NAME:$VERSION-$OS-$ARCH
 
