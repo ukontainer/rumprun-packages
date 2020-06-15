@@ -96,8 +96,8 @@ images/named.img: bin/named *.zone named.conf
 	sudo umount mnt || :
 	sudo mount images/named.img mnt
 	sudo chmod 777 mnt
-	mkdir -p mnt/etc/named/
-	cp named.conf *.zone mnt/etc/named/
+	mkdir -p mnt/etc/bind/
+	cp named.conf *.zone mnt/etc/bind/
 	sudo umount mnt
 
 .PHONY: clean
