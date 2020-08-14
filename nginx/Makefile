@@ -16,6 +16,14 @@ bin/nginx: build/objs/nginx
 build/objs/nginx: build/Makefile
 	$(MAKE) -C build
 
+CPPFLAGS += \
+	-Wno-unknown-warning-option \
+	-Wno-implicit-fallthrough \
+	-Wno-maybe-uninitialized \
+	-Wno-cast-function-type \
+	-Wno-tautological-compare \
+	-Wno-attributes
+
 NGINX_CONF_ENV += \
 	ngx_force_c_compiler=yes \
 	ngx_force_c99_have_variadic_macros=yes \
@@ -31,7 +39,7 @@ NGINX_CONF_ENV += \
 NGINX_CONF_OPTS += \
 	--crossbuild=Linux \
 	--with-cc=$(RUMPRUN_CC) \
-	--with-cc-opt="-I $(RUMPRUN_PKGS_DIR)/include" \
+	--with-cc-opt="$(CPPFLAGS) -I $(RUMPRUN_PKGS_DIR)/include" \
 	--with-ld-opt="-L $(RUMPRUN_PKGS_DIR)/lib -static" \
 	--prefix=/none \
 	--conf-path=/conf/nginx.conf \
