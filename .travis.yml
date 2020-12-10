@@ -11,8 +11,8 @@ script:
   - bash -e ./.travis-install.sh && bash -e ./.travis-script.sh
   - travis_fold end "build"
   # Add arm(32) build only for linux/arm64 instance
-  - travis_fold start "build.arm32"
   - git clean -dfx
+  - travis_fold start "build.arm32"
   - if [ $TRAVIS_ARCH == "aarch64" ] && [ $TRAVIS_OS_NAME == "linux" ] ; then ARCH=arm RUMPRUN_TOOLCHAIN_TUPLE=arm-rumprun-linux bash -e ./.travis-install.sh ; ARCH=arm bash -e ./.travis-script.sh ; fi
   - travis_fold end "build.arm32"
 
@@ -75,6 +75,7 @@ jobs:
       os: linux
       dist: trusty  # XXX: docker multi-arch image requires 17.09(dockerd):18.06(docker)
       env: RUMPKERNEL=linux
+      arch: amd64
   allow_failures:
     # no crypto.a
     - env: PACKAGE=erlang
@@ -122,6 +123,9 @@ jobs:
     # Unsupported CPU architecture
     - env: PACKAGE=nodejs
       arch: arm64
+
+after_failure:
+  - cat $HOME/*.log
 
 env:
   global:

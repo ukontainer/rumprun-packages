@@ -1,25 +1,4 @@
 #!/bin/bash
-# Builds one specific package, specified by $PACKAGE
-if [ -z "${PACKAGE}" ]; then
-	echo "PACKAGE is not set"
-	exit 1
-fi
-cd ${PACKAGE}
-# Openjdk make should not be used with option -j
-if [ "${PACKAGE}" == "openjdk8" ]; then
-	make
-else
-	# XXX: redis uses ${ARCH} in Makefile
-	ARCH="" make -j2
-fi
-
-if [ $TRAVIS_ARCH == "amd64" ] ; then
-    export ARCH=amd64
-elif [ $TRAVIS_ARCH == "aarch64" ] ; then
-    export ARCH=${ARCH:-arm64}
-fi
-
-
 
 BINARY=(
     "nginx nginx"
@@ -29,7 +8,11 @@ BINARY=(
     "nodejs node"
     "named named"
 )
-upload_to_bintray(){
+
+# upload built binaries to bintray
+upload_binary_to_bintray() {
+	local PUB_SUFFIX=$1
+
 	local bin=""
 	for i in "${BINARY[@]}"
 	do
@@ -43,10 +26,23 @@ upload_to_bintray(){
 	if [ -z "$bin" ] ; then
 		return
 	fi
+
+	# fixup arch name
+	if [ $TRAVIS_ARCH == "amd64" ] ; then
+		export ARCH=amd64
+	elif [ $TRAVIS_ARCH == "aarch64" ] ; then
+		export ARCH=${ARCH:-arm64}
+	fi
+
+	if [ -n "$PUB_SUFFIX" ] ; then
+		strip bin/$bin -o bin/$bin$PUB_SUFFIX
+	fi
+
 	echo "==== copying $bin ===="
 
-	curl -T bin/$bin -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/$bin;override=1&publish=1"
+	curl -T bin/$bin$PUB_SUFFIX -u$BINTRAY_USER:$BINTRAY_APIKEY \
+	       "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/$bin$PUB_SUFFIX;override=1&publish=1"
+
 
 	# additional installation
 	if [ "${PACKAGE}" == "nginx" ]; then
@@ -66,7 +62,7 @@ upload_to_bintray(){
 
 	if [ "${PACKAGE}" == "netperf" ]; then
 	    curl -T build/src/netserver -u$BINTRAY_USER:$BINTRAY_APIKEY \
-		 "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/netserver;override=1&publish=1"
+		 "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/netserver$PUB_SUFFIX;override=1&publish=1"
 	fi
 
 	if [ "${PACKAGE}" == "named" ]; then
@@ -75,6 +71,35 @@ upload_to_bintray(){
 				"https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/named.img;override=1&publish=1"
 		fi
 	fi
+
+	# publish !
+#	curl -X POST -u$BINTRAY_USER:$BINTRAY_APIKEY \
+#	     https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/publish
 }
 
-upload_to_bintray
+
+# Builds one specific package, specified by $PACKAGE
+if [ -z "${PACKAGE}" ]; then
+	echo "PACKAGE is not set"
+	exit 1
+fi
+
+cd ${PACKAGE}
+# Openjdk make should not be used with option -j
+if [ "${PACKAGE}" == "openjdk8" ]; then
+	MKARG=""
+# redis conflicts with ARCH env variable
+elif [ "${PACKAGE}" == "redis" ]; then
+	MKARG="ARCH= -j2"
+else
+	MKARG="-j2"
+fi
+
+make distclean || true
+make clean || true
+make $MKARG
+upload_binary_to_bintray
+# create slim image
+make clean || true
+PATH=/opt/rump-tiny/bin:$PATH make $MKARG
+upload_binary_to_bintray "-slim"

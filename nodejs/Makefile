@@ -39,7 +39,9 @@ $(NODE_BIN): $(NODE_OUT)
 	cp $^ $@
 
 $(NODE_OUT): $(BUILD_DIR)/node.gyp $(BUILD_DIR)/config.mk _third_party_main.js rumpmain.js
-	$(MAKE) -C $(BUILD_DIR)
+	sed 's/ifdef V/ifeq \($$\(V\),1)/' $(BUILD_DIR)/out/Makefile > /tmp/a
+	mv /tmp/a $(BUILD_DIR)/out/Makefile
+	$(MAKE) -C $(BUILD_DIR) V=0
 	mkdir -p bin
 	cp $(NODE_OUT) bin/
 
@@ -70,7 +72,7 @@ endif
 
 .PHONY: clean
 clean:
-	if [ -d $(BUILD_DIR) ]; then $(MAKE) -C $(BUILD_DIR) clean; rm -f $(NODE_BIN) $(NODE_BIN).bin; fi
+	if [ -d $(BUILD_DIR) ]; then $(MAKE) -C $(BUILD_DIR) clean; rm -f $(BUILD_DIR)/config.mk rm -f $(NODE_BIN) $(NODE_BIN).bin; fi
 	ln -sf default.js rumpmain.js
 	$(MAKE) -C examples clean
 

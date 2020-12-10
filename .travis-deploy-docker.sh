@@ -1,7 +1,7 @@
 #!/bin/bash
 # build additional packages to be deployed
 
-VERSION=0.3
+VERSION=0.4
 
 deploy() {
 git clone -q https://github.com/thehajime/runu-base.git
@@ -44,12 +44,12 @@ git clone -q https://github.com/thehajime/runu-base.git
        cp -f /tmp/opt/rump/bin/rexec sbin
        chmod +x sbin/* bin/*
 
-       ls -lR .
+       #ls -lR .
        # push an image to docker hub
        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-       docker build -t $DOCKER_USERNAME/runu-base:$VERSION-$OS-$ARCH .
+       docker build -t ukontainer/runu-base:$VERSION-$OS-$ARCH .
        docker images
-       docker push $DOCKER_USERNAME/runu-base:$VERSION-$OS-$ARCH
+       docker push ukontainer/runu-base:$VERSION-$OS-$ARCH
 
        cd ..
        rm -rf runu-base
@@ -62,25 +62,27 @@ git clone -q https://github.com/thehajime/runu-base.git
        local OS=$1
        local ARCH=$2
        local NAME=$3
+       local SLIM=$4
 
        cd runu-base
        mkdir -p bin imgs sbin
 
        curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-	    https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/$NAME -o bin/$NAME
+	    https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/$NAME$SLIM -o bin/$NAME
 
        if [ "$NAME" = "python" ] ; then
 	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
 		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/python.iso -o /tmp/python.iso
 	   mkdir -p usr/lib/
 	   7z x -ousr/lib /tmp/python.iso
+	   find ./usr/lib -name __pycache__ | xargs rm -rf
 	   cp $TRAVIS_BUILD_DIR/python3/Dockerfile ./
        elif [ "$NAME" = "nginx" ] ; then
 	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
 		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/data.iso -o imgs/data.iso
        elif [ "$NAME" = "netperf" ] ; then
 	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/netserver -o bin/netserver
+		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/netserver$SLIM -o bin/netserver
        elif [ "$NAME" = "named" ] ; then
 	   mkdir -p ./etc/bind/
 	   cp $TRAVIS_BUILD_DIR/named/Dockerfile ./
@@ -90,12 +92,18 @@ git clone -q https://github.com/thehajime/runu-base.git
 
        chmod +x bin/*
 
-       ls -lR .
+       #ls -lR .
        # push an image to docker hub
        echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-       docker build -f Dockerfile -t $DOCKER_USERNAME/runu-$NAME:$VERSION-$OS-$ARCH .
+
+       # strip binaries
+       if [ -n "$SLIM" ] ; then
+           strip bin/* || true
+       fi
+
+       docker build -f Dockerfile -t ukontainer/runu-$NAME:$VERSION$SLIM-$OS-$ARCH .
        docker images
-       docker push $DOCKER_USERNAME/runu-$NAME:$VERSION-$OS-$ARCH
+       docker push ukontainer/runu-$NAME:$VERSION$SLIM-$OS-$ARCH
 
        cd ..
        rm -rf runu-base
@@ -105,36 +113,37 @@ git clone -q https://github.com/thehajime/runu-base.git
 
 create_multi_arch_image() {
        local name=$1
+       local SLIM=$2
 
-       /tmp/docker/docker -D manifest create $DOCKER_USERNAME/$name:$VERSION \
-			  $DOCKER_USERNAME/$name:$VERSION-osx-amd64 \
-			  $DOCKER_USERNAME/$name:$VERSION-linux-amd64 \
-			  $DOCKER_USERNAME/$name:$VERSION-linux-arm64  \
-			  $DOCKER_USERNAME/$name:$VERSION-linux-arm
+       /tmp/docker/docker -D manifest create ukontainer/$name:$VERSION$SLIM \
+			  ukontainer/$name:$VERSION$SLIM-osx-amd64 \
+			  ukontainer/$name:$VERSION$SLIM-linux-amd64 \
+			  ukontainer/$name:$VERSION$SLIM-linux-arm64  \
+			  ukontainer/$name:$VERSION$SLIM-linux-arm
 
-       /tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/$name:$VERSION \
-			  $DOCKER_USERNAME/$name:$VERSION-osx-amd64 \
+       /tmp/docker/docker -D manifest annotate ukontainer/$name:$VERSION$SLIM \
+			  ukontainer/$name:$VERSION$SLIM-osx-amd64 \
 			  --os darwin --arch amd64
-       /tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/$name:$VERSION \
-			  $DOCKER_USERNAME/$name:$VERSION-linux-amd64 \
+       /tmp/docker/docker -D manifest annotate ukontainer/$name:$VERSION$SLIM \
+			  ukontainer/$name:$VERSION$SLIM-linux-amd64 \
 			  --os linux --arch amd64
-       /tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/$name:$VERSION \
-			  $DOCKER_USERNAME/$name:$VERSION-linux-arm64 \
+       /tmp/docker/docker -D manifest annotate ukontainer/$name:$VERSION$SLIM \
+			  ukontainer/$name:$VERSION$SLIM-linux-arm64 \
 			  --os linux --arch arm64
-       /tmp/docker/docker -D manifest annotate $DOCKER_USERNAME/$name:$VERSION \
-			  $DOCKER_USERNAME/$name:$VERSION-linux-arm \
+       /tmp/docker/docker -D manifest annotate ukontainer/$name:$VERSION$SLIM \
+			  ukontainer/$name:$VERSION$SLIM-linux-arm \
 			  --os linux --arch arm
-       /tmp/docker/docker -D manifest push $DOCKER_USERNAME/$name:$VERSION
+       /tmp/docker/docker -D manifest push ukontainer/$name:$VERSION$SLIM
 
-       /tmp/docker/docker -D manifest inspect $DOCKER_USERNAME/$name:$VERSION \
+       /tmp/docker/docker -D manifest inspect ukontainer/$name:$VERSION$SLIM \
 			  >> $HOME/docker-manifest.log
-       /tmp/docker/docker -D manifest inspect -v $DOCKER_USERNAME/$name:$VERSION \
+       /tmp/docker/docker -D manifest inspect -v ukontainer/$name:$VERSION$SLIM \
 			  >> $HOME/docker-manifest.log
 }
 
 # pre-deploy
 sudo apt-get update
-sudo apt-get install p7zip-full
+sudo apt-get install p7zip-full jq
 
 # obtain newer docker command
 curl -fsSL  curl -O https://download.docker.com/linux/static/stable/x86_64/docker-18.06.1-ce.tgz \
@@ -144,7 +153,7 @@ chmod +x /tmp/docker/docker
 
 # create images
 OS_ARCH_MTX=("linux amd64" "linux arm" "linux arm64" "osx amd64")
-PKGS="node python netperf nginx sqlite_bench named"
+PKGS="node python netperf nginx sqlite-bench named"
 
 for i in "${OS_ARCH_MTX[@]}"
 do
@@ -159,6 +168,7 @@ do
     for pkg in $PKGS
     do
 	deploy_slim ${os_arch[@]} $pkg
+	deploy_slim ${os_arch[@]} $pkg "-slim"
     done
 done
 
@@ -171,4 +181,5 @@ create_multi_arch_image runu-base
 for pkg in $PKGS
 do
     create_multi_arch_image runu-$pkg
+    create_multi_arch_image runu-$pkg "-slim"
 done
