@@ -6,6 +6,10 @@ cache:
   - apt
 before_script:
   - export -f travis_fold
+  - export -f travis_nanoseconds
+  - export -f travis_time_start
+  - export -f travis_time_finish
+
 script:
   - travis_fold start "build"
   - bash -e ./.travis-install.sh && bash -e ./.travis-script.sh
@@ -69,12 +73,20 @@ jobs:
     - env: PACKAGE=zerobuf
   include:
     - stage: deploy
+      before_install:
+        - sudo rm -rf /var/lib/apt/lists/*
+        - curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+        - sudo add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/ubuntu $(lsb_release -cs) edge"
+        - sudo apt-get update
+        - sudo apt-get -y -o Dpkg::Options::="--force-confnew" install docker-ce p7zip-full jq
       script:
         - bash -e ./.travis-deploy-docker.sh
         - bash -e ./.travis-trigger.sh ukontainer/runu
       os: linux
-      dist: trusty  # XXX: docker multi-arch image requires 17.09(dockerd):18.06(docker)
-      env: RUMPKERNEL=linux
+      dist: bionic
+      env:
+       - RUMPKERNEL=linux
+       - DOCKER_CLI_EXPERIMENTAL=enabled
       arch: amd64
   allow_failures:
     # no crypto.a

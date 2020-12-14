@@ -1,0 +1,13 @@
+{
+    "interfaces": [
+        {
+            "ip": "1.1.1.5",
+            "masklen": "24",
+            "name": "tap0",
+            "type": "rumpfd"
+        }
+    ],
+    "debug": "1",
+    "singlecpu": "1",
+    "delay_main": "50000",
+}

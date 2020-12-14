@@ -1,0 +1,16 @@
+{
+    "gateway": "172.17.0.1",
+    "interfaces": [
+        {
+            "ip": "172.17.0.39",
+            "masklen": "16",
+            "name": "tap0",
+            "offload": "0xc803",
+            "type": "rumpfd"
+        }
+    ],
+    "debug": "1",
+    "singlecpu": "1",
+    "delay_main": "50000",
+    "sysctl": "net.ipv4.tcp_wmem=4096 87380 100000000"
+}

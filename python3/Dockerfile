@@ -1,12 +1,15 @@
 FROM scratch
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 COPY lkl.json /
 COPY lkl-offload.json /
 COPY ./imgs /imgs
-COPY ./bin /bin
-COPY ./sbin /sbin
+COPY ./$TARGETPLATFORM/bin /bin
+COPY ./$TARGETPLATFORM/sbin /sbin
 
 # for python specific
-COPY usr/ /usr/
+COPY ./$TARGETPLATFORM/usr/ /usr/
 
 ENV PYTHONHOME=/usr
 ENV LKL_USE_9PFS=1

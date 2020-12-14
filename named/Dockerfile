@@ -1,4 +1,4 @@
-FROM alpine:3.9 as data-src
+FROM --platform=linux/amd64 alpine:3.9 as data-src
 
 RUN apk update \
         && apk add bind \
@@ -9,12 +9,15 @@ RUN apk update \
         && chmod -R u+rwx /var/bind
 
 FROM scratch
+ARG TARGETPLATFORM
+ARG BUILDPLATFORM
+
 COPY lkl.json /
 COPY lkl-offload.json /
 
 COPY --from=data-src /var/bind/ /var/bind/
 ADD https://www.internic.net/domain/named.cache /var/bind/named.ca
-COPY ./bin /bin
+COPY ./$TARGETPLATFORM/bin /bin
 ADD ./etc  /etc
 
 ENV LKL_USE_9PFS=1
