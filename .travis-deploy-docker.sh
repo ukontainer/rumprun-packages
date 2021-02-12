@@ -113,6 +113,7 @@ create_multi_arch_image() {
 
        if [ "$NAME" = "python" ] ; then
 	   cp $TRAVIS_BUILD_DIR/python3/Dockerfile ./
+	   cp $TRAVIS_BUILD_DIR/python3/.dockerignore ./
        elif [ "$NAME" = "named" ] ; then
 	   cp $TRAVIS_BUILD_DIR/named/Dockerfile ./
        fi
