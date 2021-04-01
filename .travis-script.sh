@@ -9,8 +9,62 @@ BINARY=(
     "named named"
 )
 
-# upload built binaries to bintray
-upload_binary_to_bintray() {
+# upload built binaries to github releases
+upload_a_file_to_github() {
+    FILE=$1
+    DEST_FILE=$2
+    TAG=dev
+    ACCEPT_HEADER="Accept: application/vnd.github.jean-grey-preview+json"
+    TOKEN_HEADER="Authorization: token $GITHUB_TOKEN"
+    ENDPOINT="https://api.github.com/repos/$TRAVIS_REPO_SLUG/releases"
+
+
+    echo "Creating new release as version ${TAG}..."
+    REPLY=$(curl -s -H "${ACCEPT_HEADER}" -H "${TOKEN_HEADER}" -d "{\"tag_name\": \"${TAG}\", \"name\": \"${TAG}\"}" "${ENDPOINT}")
+
+    # Check error
+    RELEASE_ID=$(echo "${REPLY}" | jq .id)
+
+    # retry for pre-existing tag case
+    if [ "${RELEASE_ID}" = "null" ] || [ "${RELEASE_ID}" = "" ] ; then
+	RELEASE_ID=$(curl -H "${TOKEN_HEADER}" ${ENDPOINT} | jq -r ".[] | select(.tag_name == \"$TAG\") | .id")
+    fi
+
+    if [ "${RELEASE_ID}" = "null" ]; then
+	echo "Failed to create release. Please check your configuration. Github replies:"
+	echo "${REPLY}"
+	exit 1
+    fi
+
+    echo "Github release created as ID: ${RELEASE_ID}"
+    RELEASE_URL="https://uploads.github.com/repos/$TRAVIS_REPO_SLUG/releases/${RELEASE_ID}/assets"
+
+
+    # Uploads artifacts
+    MIME=$(file -b --mime-type "${FILE}")
+
+    # delete previous asset
+    ASSET_ID=$(curl -s -H "${TOKEN_HEADER}" ${ENDPOINT} | jq -r ".[] | select(.tag_name == \"$TAG\") | .assets | .[] | select(.name == \"$DEST_FILE\") | .id")
+    echo "Deleting previous assets ${DEST_FILE} if any..."
+
+    curl  \
+	-X DELETE \
+	-H "${TOKEN_HEADER}" \
+	-H "Accept: application/vnd.github.v3+json" \
+	"${ENDPOINT}/assets/"$ASSET_ID || true
+
+    echo "Uploading assets ${DEST_FILE} as ${MIME}..."
+    curl -v \
+	 -H "${ACCEPT_HEADER}" \
+	 -H "${TOKEN_HEADER}" \
+	 -H "Content-Type: ${MIME}" \
+	 --data-binary "@${FILE}" \
+	 "${RELEASE_URL}?name=${DEST_FILE}"
+
+    echo "Finished."
+}
+
+upload_binary_to_github() {
 	local PUB_SUFFIX=$1
 
 	local bin=""
@@ -39,42 +93,31 @@ upload_binary_to_bintray() {
 	fi
 
 	echo "==== copying $bin ===="
-
-	curl -T bin/$bin$PUB_SUFFIX -u$BINTRAY_USER:$BINTRAY_APIKEY \
-	       "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/$bin$PUB_SUFFIX;override=1&publish=1"
+	upload_a_file_to_github "bin/$bin$PUB_SUFFIX" "$bin-$TRAVIS_OS_NAME-$ARCH$PUB_SUFFIX"
 
 
 	# additional installation
 	if [ "${PACKAGE}" == "nginx" ]; then
-	    curl -T images/data.iso -u$BINTRAY_USER:$BINTRAY_APIKEY \
-		 "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/data.iso;override=1&publish=1"
+	    upload_a_file_to_github "images/data.iso" "data-$TRAVIS_OS_NAME-$ARCH.iso"
 	fi
 
 	if [ "${PACKAGE}" == "python3" ]; then
 		if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_ARCH" == "amd64" ]; then
-			curl -T images/python.img -u$BINTRAY_USER:$BINTRAY_APIKEY \
-			     "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/python.img;override=1&publish=1"
+			upload_a_file_to_github "images/python.img" "python-$TRAVIS_OS_NAME-$ARCH.img"
 		fi
 
-		curl -T images/python.iso -u$BINTRAY_USER:$BINTRAY_APIKEY \
-		     "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/python.iso;override=1&publish=1"
+		upload_a_file_to_github "images/python.iso" "python-$TRAVIS_OS_NAME-$ARCH.iso"
 	fi
 
 	if [ "${PACKAGE}" == "netperf" ]; then
-	    curl -T build/src/netserver -u$BINTRAY_USER:$BINTRAY_APIKEY \
-		 "https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/netserver$PUB_SUFFIX;override=1&publish=1"
+	    upload_a_file_to_github "build/src/netserver" "netserver-$TRAVIS_OS_NAME-$ARCH$PUB_SUFFIX"
 	fi
 
 	if [ "${PACKAGE}" == "named" ]; then
 		if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$TRAVIS_ARCH" == "amd64" ]; then
-			curl -T images/named.img -u$BINTRAY_USER:$BINTRAY_APIKEY \
-				"https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/$TRAVIS_OS_NAME/$ARCH/named.img;override=1&publish=1"
+			upload_a_file_to_github "images/named.img" "named-$TRAVIS_OS_NAME-$ARCH.img"
 		fi
 	fi
-
-	# publish !
-#	curl -X POST -u$BINTRAY_USER:$BINTRAY_APIKEY \
-#	     https://api.bintray.com/content/ukontainer/ukontainer/rumprun-packages/dev/publish
 }
 
 
@@ -97,9 +140,9 @@ fi
 
 make distclean || true
 make clean || true
-make $MKARG
-upload_binary_to_bintray
+make $MKARG > $HOME/make.log
+upload_binary_to_github
 # create slim image
 make clean || true
-PATH=/opt/rump-tiny/bin:$PATH make $MKARG
-upload_binary_to_bintray "-slim"
+PATH=/opt/rump-tiny/bin:$PATH make $MKARG > $HOME/make-tiny.log
+upload_binary_to_github "-slim"

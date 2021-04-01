@@ -29,54 +29,41 @@ mkdir -p rootfs
 
        mkdir -p imgs $TARGET_PLATFORM/bin $TARGET_PLATFORM/sbin
 
+       BASE_URL="https://github.com/ukontainer/rumprun-packages/releases/download/dev"
        if [ "$NAME" != "base" ] ; then
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/$NAME$SLIM -o $TARGET_PLATFORM/bin/$NAME
+	   curl -L $BASE_URL/$NAME-$OS-$ARCH$SLIM -o $TARGET_PLATFORM/bin/$NAME
        fi
 
        if [ "$NAME" = "python" ] ; then
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/python.iso -o /tmp/python.iso
+	   curl -L $BASE_URL/python-$OS-$ARCH.iso -o /tmp/python.iso
 
 	   mkdir -p $TARGET_PLATFORM/usr/lib/
 	   7z x -o$TARGET_PLATFORM/usr/lib /tmp/python.iso
 	   find ./$TARGET_PLATFORM/usr/lib -name __pycache__ | xargs rm -rf
        elif [ "$NAME" = "nginx" ] ; then
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/data.iso -o imgs/data.iso
+	   curl -L $BASE_URL/data-$OS-$ARCH.iso -o imgs/data.iso
        elif [ "$NAME" = "netperf" ] ; then
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/netserver$SLIM -o $TARGET_PLATFORM/bin/netserver
+	   curl -L $BASE_URL/netserver-$OS-$ARCH$SLIM -o $TARGET_PLATFORM/bin/netserver
        elif [ "$NAME" = "named" ] ; then
 	   mkdir -p ./etc/bind/
 	   cp $TRAVIS_BUILD_DIR/named/named.conf ./etc/bind/
 	   cp $TRAVIS_BUILD_DIR/named/*.zone ./etc/bind/
        elif [ "$NAME" = "base" ] ; then
 	   # copy binaries
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/nginx -o $TARGET_PLATFORM/bin/nginx
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/python -o $TARGET_PLATFORM/bin/python
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/netperf -o $TARGET_PLATFORM/bin/netperf
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/netserver -o $TARGET_PLATFORM/bin/netserver
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/named -o $TARGET_PLATFORM/bin/named
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/sqlite-bench -o $TARGET_PLATFORM/bin/sqlite-bench
-
+	   curl -L $BASE_URL/nginx-$OS-$ARCH$SLIM -o $TARGET_PLATFORM/bin/nginx
+	   curl -L $BASE_URL/python-$OS-$ARCH$SLIM -o $TARGET_PLATFORM/bin/python
+	   curl -L $BASE_URL/netperf-$OS-$ARCH$SLIM -o $TARGET_PLATFORM/bin/netperf
+	   curl -L $BASE_URL/netserver-$OS-$ARCH$SLIM -o $TARGET_PLATFORM/bin/netserver
+	   curl -L $BASE_URL/named-$OS-$ARCH$SLIM -o $TARGET_PLATFORM/bin/named
+	   curl -L $BASE_URL/sqlite-bench-$OS-$ARCH$SLIM -o $TARGET_PLATFORM/bin/sqlite-bench
 	   # copy rootfs images
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/data.iso -o imgs/data.iso
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/linux/amd64/python.img -o imgs/python.img
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/python.iso -o imgs/python.iso
-	   curl -L -u $BINTRAY_USER:$BINTRAY_APIKEY \
-		https://dl.bintray.com/ukontainer/ukontainer/linux/amd64/named.img -o imgs/named.img
+	   curl -L $BASE_URL/python-linux-amd64.img -o imgs/python.img
+	   curl -L $BASE_URL/python-$OS-$ARCH.iso -o imgs/python.iso
+	   curl -L $BASE_URL/named-linux-amd64.img -o imgs/named.img
 
-	   curl -L https://dl.bintray.com/ukontainer/ukontainer/$OS/$ARCH/frankenlibc.tar.gz \
+
+	   curl -L \
+		https://github.com/ukontainer/frankenlibc/releases/download/dev/frankenlibc-$ARCH-$OS.tar.gz \
 		-o /tmp/frankenlibc.tar.gz
 	   tar xfz /tmp/frankenlibc.tar.gz -C /tmp/
 	   cp -f /tmp/opt/rump/bin/hello $TARGET_PLATFORM/bin
