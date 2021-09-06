@@ -4,6 +4,9 @@ filter_secrets: false
 cache:
   - ccache
   - apt
+branches:
+  except:
+    - /^dev/
 before_script:
   - export -f travis_fold
   - export -f travis_nanoseconds
