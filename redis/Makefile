@@ -5,6 +5,8 @@ PERSISTENCE_SIZE=2040
 CC=$(RUMPRUN_CC)
 CXX=$(RUMPRUN_CXX)
 export CC CXX
+## XX: redis build use $ARCH
+ARCH=
 
 all: bin/redis-server images/data.iso images/datapers.img
 
@@ -32,9 +34,10 @@ images/datapers.img:
 	dd if=/dev/zero of=$@ bs=1024k seek=$(PERSISTENCE_SIZE) count=0
 	mkfs.ext2 -F -q $@
 
-.PHONY: clean
+.PHONY: clean distclean
 clean:	clean/build clean/bin
-	
+distclean: clean
+
 clean/build:
 	rm -rf build
 

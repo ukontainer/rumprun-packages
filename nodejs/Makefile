@@ -14,7 +14,7 @@ ifeq ($(RUMPRUN_TOOLCHAIN_ARCH),i486)
 	CPU=x86
 endif
 ifndef CPU
-	$(error Unsupported CPU architecture)
+$(error Unsupported CPU architecture)
 endif
 
 export CC=$(RUMPRUN_TOOLCHAIN_TUPLE)-cc

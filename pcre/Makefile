@@ -16,6 +16,12 @@ PCRE_CONF_OPTS += \
 	--disable-cpp \
 	--disable-shared
 
+# after macos 10.14(?), -O2 flag make unresolved symbol '__DefaultRuneLocale',
+# ___memmove_chk, etc, thus disable it by -O1 (-O0 doesn't work).
+ifeq ($(shell uname),Darwin)
+PCRE_CONF_OPTS += "CFLAGS=-O1 -fno-stack-check"
+endif
+
 build/Makefile: build/configure
 	(cd build; \
 	./configure --host=$(RUMPRUN_TOOLCHAIN_TUPLE) $(PCRE_CONF_OPTS);)

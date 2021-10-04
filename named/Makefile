@@ -7,7 +7,7 @@ ifeq ($(shell arch),x86_64)
 # linux/amd64
 all: images/named.img
 else
-# linux/arm64
+# linux/arm64, arm32
 all: bin/named
 endif
 else
@@ -39,6 +39,7 @@ NAMED_CONF_OPTS += \
 	--without-gssapi \
 	--without-libxml2 \
 	--with-dlopen=no \
+	--with-randomdev=no \
 	--prefix=$(RUMPRUN_PKGS_DIR)
 
 dl/$(TARBALL):
@@ -65,8 +66,8 @@ build/bind9_patch_stamp: patches/* build/bind9_extract_stamp
 # 3. configure
 #
 build/bind9/Makefile: build/bind9_patch_stamp
-	(cd $(BUILD_DIR); CC=$(RUMPRUN_CC) LDFLAGS=-static \
-	 ./configure --build=$(shell uname -m)-unknown-linux $(NAMED_CONF_OPTS))
+	(cd $(BUILD_DIR); CC=$(RUMPRUN_CC) BUILD_CC=$(RUMPRUN_CC) LDFLAGS=-static \
+	 ./configure --host=$(RUMPRUN_TOOLCHAIN_TUPLE) $(NAMED_CONF_OPTS))
 
 #
 # 4. build libs

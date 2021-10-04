@@ -18,7 +18,7 @@ bin/netperf: build/src/netperf
 build/src/netperf: build/Makefile
 	$(MAKE) -C build/
 
-build/Makefile: build/configure build/stamp_patch
+build/Makefile: build/configure
 	(cd build/ && \
 		./configure --build=x86_64-unknown-netbsd \
 		--host=$(RUMPRUN_TOOLCHAIN_TUPLE) $(NETPERF_CONF_OPTS) \
@@ -26,7 +26,9 @@ build/Makefile: build/configure build/stamp_patch
 
 build/configure:
 	mkdir -p build
-	(cd build && git clone $(UPSTREAM) . && sh autogen.sh)
+	(cd build && git clone $(UPSTREAM) . && cd ..)
+	../scripts/apply-patches.sh build/ patches/*
+	(cd build && sh autogen.sh && cd ..)
 
 build/stamp_patch: build/configure patches/*
 	../scripts/apply-patches.sh build/ patches/*

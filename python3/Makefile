@@ -17,6 +17,7 @@ endif
 ifeq ($(shell uname),Darwin)
 PYTHON_CONF_OPTS += --with-suffix=.exe
 EXESUFFIX = .exe
+HOST_CFLAGS = -Wno-error-implicit-function-declaration
 endif
 
 .NOTPARALLEL: $(RUMPRUN_PKGS_DIR)/lib/libsqlite.a
@@ -58,7 +59,7 @@ dl/$(TARBALL):
 build/hostpython: | dl/$(TARBALL)
 	mkdir -p build
 	(cd build && tar -x --strip-components 1 -f ../dl/$(TARBALL))
-	(cd build; ./configure --prefix=$(shell pwd)/build/hostdist; make python Parser/pgen && make install)
+	(cd build; CFLAGS=$(HOST_CFLAGS) ./configure --prefix=$(shell pwd)/build/hostdist; make python Parser/pgen && make install)
 	mv build/python$(EXESUFFIX) build/hostpython
 
 build/Parser/hostpgen: build/hostpython

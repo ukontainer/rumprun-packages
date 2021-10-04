@@ -1,0 +1,441 @@
+name: CI
+on:
+  push:
+    branches:
+      - '**'
+    tags:
+      - 'v*'
+  pull_request:
+    branches:
+      - master
+      - 'release/**'
+  workflow_dispatch:
+    inputs:
+      debug_enabled:
+        description: 'Run the build with tmate debugging enabled (https://github.com/marketplace/actions/debugging-with-tmate)'
+        required: false
+        default: false
+
+jobs:
+  #
+  # setup/build/package
+  #
+  build:
+    name: ${{ matrix.package }} (${{ matrix.os }}/${{ matrix.arch }})
+    runs-on: ${{ matrix.runs_on }}
+    strategy:
+      fail-fast: true
+      matrix:
+        os: [macos, linux]
+        arch: [amd64, arm32, arm64]
+        package: [python3, nodejs, named, netperf, nginx, redis, sqlite-bench, zlib]
+        exclude:
+          - os: macos
+            arch: arm32
+          - os: macos
+            arch: arm64
+          - os: linux
+            arch: arm32
+            package: nodejs
+          - os: linux
+            arch: arm64
+            package: nodejs
+        include:
+          - displayTargetName: linux-amd64
+            os: linux
+            arch: amd64
+            os_alias: linux
+            arch_alias: amd64
+            runs_on: ubuntu-18.04
+            cc: clang
+            cxx: clang++
+            rumprun_tuple: x86_64-rumprun-linux
+          - displayTargetName: macOS-amd64
+            os: macos
+            arch: amd64
+            os_alias: osx
+            arch_alias: amd64
+            runs_on: macos-11
+            cc: clang
+            cxx: clang++
+            rumprun_tuple: x86_64-rumprun-linux
+          - displayTargetName: linux-arm32
+            os: linux
+            arch: arm32
+            os_alias: linux
+            arch_alias: armhf
+            runs_on: ubuntu-18.04
+            cc: arm-linux-gnueabihf-gcc
+            cxx: g++
+            rumprun_tuple: arm-rumprun-linux
+          - displayTargetName: linux-arm64
+            os: linux
+            arch: arm64
+            os_alias: linux
+            arch_alias: arm64
+            runs_on: ubuntu-18.04
+            cc: aarch64-linux-gnu-gcc
+            cxx: g++
+            rumprun_tuple: aarch64-rumprun-linux
+          - package: named
+            package_alias: named
+          - package: netperf
+            package_alias: netperf
+          - package: nginx
+            package_alias: nginx
+          - package: nodejs
+            package_alias: node
+          - package: python3
+            package_alias: python
+          - package: redis
+            package_alias: redis-server
+          - package: sqlite-bench
+            package_alias: sqlite-bench
+    timeout-minutes: 100
+    env:
+      CCACHE_DIR: ${{ github.workspace }}/.ccache
+      USE_CCACHE: 1
+      working-directory: src/rumprun-packages
+      ARCH: ${{ matrix.arch }}
+      CC: ${{ matrix.cc }}
+      CXX: ${{ matrix.cxx }}
+      RUMPRUN_TOOLCHAIN_TUPLE: ${{ matrix.rumprun_tuple }}
+
+    defaults:
+      run:
+        working-directory: src/rumprun-packages
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          path: src/rumprun-packages
+          submodules: true
+
+      - name: Install LLVM and Clang
+        if: runner.os == 'linux' && matrix.arch == 'amd64'
+        uses: KyleMayes/install-llvm-action@v1
+        with:
+          version: "10.0"
+
+      - name: Install frankenlibc
+        env:
+          URL: "https://github.com/ukontainer/frankenlibc/releases/download/latest/frankenlibc-${{ matrix.arch }}-${{ matrix.os_alias }}.tar.gz"
+          TINY_URL: "https://github.com/ukontainer/frankenlibc/releases/download/latest/frankenlibc-tiny-${{ matrix.arch }}-${{ matrix.os_alias }}.tar.gz"
+        run: |
+          curl -L ${{ env.URL }} -o /tmp/frankenlibc.tar.gz
+          sudo mkdir -p /opt/rump && sudo chown $USER /opt/rump
+          tar xfz /tmp/frankenlibc.tar.gz -C /
+
+          curl -L ${{ env.TINY_URL }} -o /tmp/frankenlibc-tiny.tar.gz
+          sudo mkdir -p /opt/rump-tiny && sudo chown $USER /opt/rump-tiny
+          tar xfz /tmp/frankenlibc-tiny.tar.gz -C /
+
+          echo RUMPRUN_TOOLCHAIN_TUPLE=${{ env.RUMPRUN_TOOLCHAIN_TUPLE }} >config.mk
+
+      - name: Set env
+        shell: bash
+        run: |
+          echo "/usr/lib/ccache/bin:/usr/lib/ccache:/usr/local/opt/ccache/libexec:$HOME/.local/bin:/opt/rump/bin:${{ github.workspace }}/bin" >> $GITHUB_PATH
+          echo "export PATH=/usr/lib/ccache/bin:/usr/lib/ccache:/usr/local/opt/ccache/libexec:$HOME/.local/bin:/opt/rump/bin:${{ github.workspace }}/bin:$PATH" >> $HOME/.bashrc
+
+      - uses: actions/cache@v2
+        with:
+          path: ${{ env.CCACHE_DIR }}
+          key: ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.package }}-ccache-build-${{ github.sha }}
+          restore-keys: ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.package }}-ccache-build-
+
+      - name: pkg dependency
+        run: |
+          pip install yamlish
+
+      - name: pkg dependency (linux)
+        if: runner.os == 'linux'
+        run: |
+          sudo apt update -y
+          sudo apt install -y ccache makefs genisoimage
+          sudo ln -sf /usr/bin/ccache /usr/lib/ccache/clang
+          sudo ln -sf /usr/bin/ccache /usr/lib/ccache/clang++
+
+      - name: pkg dependency (linux-cross)
+        if: runner.os == 'linux' && ( matrix.arch == 'arm32' || matrix.arch == 'arm64')
+        run: |
+          sudo apt-get update -y
+          sudo apt-get install -y crossbuild-essential-${{ matrix.arch_alias }}
+
+      - name: pkg dependency (macOS)
+        if: runner.os == 'macos'
+        run: |
+          mkdir -p ~/.local/bin
+          brew install gnu-sed ccache e2fsprogs
+          brew install binutils coreutils jq automake
+          ln -sf /usr/local/bin/gsed ~/.local/bin/sed
+          ln -sf /usr/local/bin/gdate ~/.local/bin/date
+          ln -sf /usr/local/opt/e2fsprogs/sbin/mkfs.ext4 ~/.local/bin/
+          ln -sf /usr/local/opt/e2fsprogs/sbin/mkfs.ext2 ~/.local/bin/
+          # we didn't use gcp as CoW of coreutil 9.0 breaks somehow
+          #ln -sf /usr/local/opt/coreutils/bin/gcp ~/.local/bin/cp
+          ln -sf /usr/local/opt/binutils/bin/objcopy ~/.local/bin/objcopy
+
+      - name: ccache counter reset
+        run: ccache -z
+
+      - name: build
+        run: |
+          make -j4 -C ${{ matrix.package }}
+
+      - name: upload artifact
+        if: matrix.package != 'zlib'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.package_alias }}-${{ matrix.os_alias }}-${{ matrix.arch }}
+          path: |
+            src/rumprun-packages/${{ matrix.package }}/bin/${{ matrix.package_alias }}
+
+      - name: upload artifact (nginx)
+        if: matrix.package == 'nginx'
+        uses: actions/upload-artifact@v2
+        with:
+          name: data-${{ matrix.os_alias }}-${{ matrix.arch }}.iso
+          path: |
+            src/rumprun-packages/${{ matrix.package }}/images/data.iso
+
+      - name: upload artifact (python3)
+        if: matrix.package == 'python3'
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-${{ matrix.os_alias }}-${{ matrix.arch }}.iso
+          path: |
+            src/rumprun-packages/${{ matrix.package }}/images/python.iso
+      - name: upload artifact (python3/linux)
+        if: matrix.package == 'python3' && runner.os == 'linux' && matrix.arch == 'amd64'
+        uses: actions/upload-artifact@v2
+        with:
+          name: python-${{ matrix.os_alias }}-${{ matrix.arch }}.img
+          path: |
+            src/rumprun-packages/${{ matrix.package }}/images/python.img
+
+      - name: upload artifact (netperf)
+        if: matrix.package == 'netperf'
+        uses: actions/upload-artifact@v2
+        with:
+          name: netserver-${{ matrix.os_alias }}-${{ matrix.arch }}
+          path: |
+            src/rumprun-packages/${{ matrix.package }}/bin/netserver
+
+      - name: upload artifact (named)
+        if: matrix.package == 'named' && runner.os == 'linux'
+        uses: actions/upload-artifact@v2
+        with:
+          name: named-${{ matrix.os_alias }}-${{ matrix.arch }}.img
+          path: |
+            src/rumprun-packages/${{ matrix.package }}/images/named.img
+
+
+
+      - name: build (tiny)
+        run: |
+          make distclean -C ${{ matrix.package }}
+          PATH=/opt/rump-tiny/bin:$PATH make -j4 -C ${{ matrix.package }}
+          # XXX: TODO use cross tools
+          strip ${{ matrix.package }}/bin/${{ matrix.package_alias }} || true
+
+      - name: upload artifact (tiny)'
+        if: matrix.package != 'zlib'
+        uses: actions/upload-artifact@v2
+        with:
+          name: ${{ matrix.package_alias }}-${{ matrix.os_alias }}-${{ matrix.arch }}-slim
+          path: |
+            src/rumprun-packages/${{ matrix.package }}/bin/${{ matrix.package_alias }}
+
+      - name: upload artifact (netperf) (tiny)
+        if: matrix.package == 'netperf'
+        uses: actions/upload-artifact@v2
+        with:
+          name: netserver-${{ matrix.os_alias }}-${{ matrix.arch }}-slim
+          path: |
+            src/rumprun-packages/${{ matrix.package }}/bin/netserver
+
+
+      - name: ccache stat
+        if: always()
+        run: |
+          ccache --show-stats
+
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+
+      - name: Annotate
+        uses: yuzutech/annotations-action@v0.3.0
+        with:
+          repo-token: "${{ secrets.GITHUB_TOKEN }}"
+          input: "${{env.working-directory}}/annotations.json"
+          title: "dmesg (${{ matrix.runs_on }})"
+
+  docker-image:
+    needs: build
+    runs-on: ubuntu-18.04
+    name: image
+    if: ${{ gitHub.event_name == 'release' }}
+    strategy:
+      fail-fast: false
+      matrix:
+        package: [named, netperf, nginx, node, python, sqlite-bench, base]
+        image_type: ["", "-slim"]
+    permissions:
+      contents: read
+      packages: write
+    services:
+      registry:
+        image: registry:2
+        ports:
+          - 5000:5000
+    env:
+      registry: ghcr.io/
+      #registry: localhost:5050/
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - uses: actions/download-artifact@v2
+        with:
+          path: artifacts
+      - name: Display structure of downloaded files
+        run: ls -lR
+        working-directory: artifacts
+      - name: build rootfs
+        run: |
+          #set -x
+          mkdir -p rootfs
+          cd rootfs
+          for target in darwin/amd64 linux/amd64 linux/arm/v7 linux/arm64
+          do
+            mkdir -p imgs $target/bin $target/sbin
+
+            SUFFIX=""
+            RSUFFIX=""
+            if [ "$target" == "darwin/amd64" ] ; then
+              SUFFIX="osx-amd64"
+              RSUFFIX="amd64-osx"
+            elif [ "$target" == "linux/amd64" ] ; then
+              SUFFIX="linux-amd64"
+              RSUFFIX="amd64-linux"
+            elif [ "$target" == "linux/arm/v7" ] ; then
+              SUFFIX="linux-arm32"
+              RSUFFIX="arm32-linux"
+            elif [ "$target" == "linux/arm64" ] ; then
+              SUFFIX="linux-arm64"
+              RSUFFIX="arm64-linux"
+            fi
+
+            if [ "${{ matrix.image_type }}" == "-slim" ] ; then
+              SUFFIX=$SUFFIX"-slim"
+              RSUFFIX="tiny-"$RSUFFIX
+            fi
+
+            if [ ${{ matrix.package }} != "base" ] ; then
+              if [ -f ../artifacts/${{ matrix.package }}-$SUFFIX/${{ matrix.package }} ] ; then
+                cp ../artifacts/${{ matrix.package }}-$SUFFIX/${{ matrix.package }} $target/bin
+              fi
+            fi
+
+            if [ ${{ matrix.package }} == "python" ] ; then
+              mkdir -p $target/usr/lib/
+              7z x -o$target/usr/lib ../artifacts/python-${SUFFIX//-slim/}.iso/python.iso
+              find ./$target/usr/lib -name __pycache__ | xargs rm -rf
+            elif [ ${{ matrix.package }} == "nginx" ] ; then
+              cp ../artifacts/data-${SUFFIX//-slim/}.iso/data.iso ./imgs/
+            elif [ ${{ matrix.package }} == "netperf" ] ; then
+              cp ../artifacts/netserver-$SUFFIX/netserver $target/bin
+            elif [ ${{ matrix.package }} == "named" ] ; then
+               mkdir -p ./etc/bind/
+               cp ../named/named.conf ./etc/bind/
+               cp ../named/*.zone ./etc/bind/
+            elif [ ${{ matrix.package }} == "base" ] ; then
+              cp ../artifacts/nginx-$SUFFIX/nginx $target/bin
+              cp ../artifacts/python-$SUFFIX/python $target/bin
+              cp ../artifacts/netperf-$SUFFIX/netperf $target/bin
+              cp ../artifacts/netserver-$SUFFIX/netserver $target/bin
+              cp ../artifacts/named-$SUFFIX/named $target/bin
+              cp ../artifacts/sqlite-bench-$SUFFIX/sqlite-bench $target/bin
+              cp ../artifacts/python-$SUFFIX/python $target/bin
+
+              cp ../artifacts/data-${SUFFIX//-slim/}.iso/data.iso ./imgs/
+              cp ../artifacts/python-${SUFFIX//-slim/}.iso/python.iso ./imgs/
+              cp ../artifacts/named-linux-amd64.img/named.img ./imgs/
+              cp ../artifacts/python-linux-amd64.img/python.img ./imgs/
+
+              curl -L \
+                https://github.com/ukontainer/frankenlibc/releases/download/latest/frankenlibc-${RSUFFIX//tiny-}.tar.gz \
+                -o /tmp/frankenlibc.tar.gz
+              tar xfz /tmp/frankenlibc.tar.gz -C /tmp/
+              cp -f /tmp/opt/rump/bin/hello $target/bin
+              cp -f /tmp/opt/rump/bin/ping $target/bin
+              cp -f /tmp/opt/rump/bin/ping6 $target/bin
+              cp -f /tmp/opt/rump/bin/rexec $target/sbin
+              chmod +x $target/sbin/*
+            fi
+            chmod +x $target/bin/* || true
+          done
+
+          cp ../utils/* ./
+          if [ ${{ matrix.package }} == "python" ] ; then
+            cp ../python3/Dockerfile ./
+          elif [ ${{ matrix.package }} == "named" ] ; then
+            cp ../named/Dockerfile ./
+          fi
+          tree -hp .
+          cd ..
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v1
+        with:
+          driver-opts: network=host
+      - name: Log in to docker.io
+        uses: docker/login-action@v1.10.0
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Log in to the ghcr.io
+        uses: docker/login-action@f054a8b539a109f9f41c372932f1ae047eff08c9
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+      - name: Set environment variables for branch name
+        run: |
+           # Short name for current branch. For PRs, use target branch (base ref)
+           GIT_BRANCH=${GITHUB_BASE_REF:-${GITHUB_REF#refs/*/}}
+           echo "GIT_BRANCH=$GIT_BRANCH" >> $GITHUB_ENV
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: rootfs
+          platforms: linux/amd64,linux/arm64,linux/arm,darwin/amd64
+          push: true
+          tags: |
+            ghcr.io/ukontainer/runu-${{ matrix.package }}:${{ env.GIT_BRANCH }}${{ matrix.image_type }}
+            docker.io/ukontainer/runu-${{ matrix.package }}:${{ env.GIT_BRANCH }}${{ matrix.image_type }}
+      - name: Inspect
+        run: |
+          docker buildx imagetools inspect \
+            ghcr.io/ukontainer/runu-${{ matrix.package }}:${{ env.GIT_BRANCH }}${{ matrix.image_type }}
+          docker buildx imagetools inspect \
+            docker.io/ukontainer/runu-${{ matrix.package }}:${{ env.GIT_BRANCH }}${{ matrix.image_type }}
+
+  trigger:
+    needs: docker-image
+    runs-on: ubuntu-18.04
+    name: downstream
+    if: github.ref == 'refs/heads/lkl-musl'
+    steps:
+      - name: trigger downstream
+        run: |
+          echo "to be implemented"
+      #- name: Repository Dispatch
+      #  uses: peter-evans/repository-dispatch@v1
+      #  with:
+      #    token: ${{ secrets.REPO_ACCESS_TOKEN }}
+      #    repository: ukontainer/runu
+      #    event-type: trigger-test
+      #    client-payload: '{"img_version": "${{ github.ref }}", "repository": "$GITHUB_REPOSITORY"}'
