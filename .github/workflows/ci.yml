@@ -428,6 +428,8 @@ jobs:
     needs: docker-image
     runs-on: ubuntu-18.04
     name: downstream
+    permissions:
+      contents: write
     if: ${{ github.event_name == 'release' }}
     steps:
       - name: Set environment variables for image name
