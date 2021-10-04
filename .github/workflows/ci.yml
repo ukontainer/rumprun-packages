@@ -3,8 +3,6 @@ on:
   push:
     branches:
       - '**'
-    tags:
-      - 'v*'
   pull_request:
     branches:
       - master
@@ -430,15 +428,16 @@ jobs:
     needs: docker-image
     runs-on: ubuntu-18.04
     name: downstream
-    if: github.ref == 'refs/heads/lkl-musl'
+    if: ${{ github.event_name == 'release' }}
     steps:
-      - name: trigger downstream
+      - name: Set environment variables for image name
         run: |
-          echo "to be implemented"
-      #- name: Repository Dispatch
-      #  uses: peter-evans/repository-dispatch@v1
-      #  with:
-      #    token: ${{ secrets.REPO_ACCESS_TOKEN }}
-      #    repository: ukontainer/runu
-      #    event-type: trigger-test
-      #    client-payload: '{"img_version": "${{ github.ref }}", "repository": "$GITHUB_REPOSITORY"}'
+           IMAGE_VERSION=`git describe --tags --abbrev=0 | sed "s/^v//`
+           echo "IMAGE_VERSION=$IMAGE_VERSION" >> $GITHUB_ENV
+      - name: Repository Dispatch
+        uses: peter-evans/repository-dispatch@v1
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          repository: ukontainer/runu
+          event-type: trigger-test
+          client-payload: '{"img_version": "${{ env.IMAGE_VERSION }}", "repository": "$GITHUB_REPOSITORY"}'
