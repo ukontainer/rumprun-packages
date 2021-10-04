@@ -9,6 +9,9 @@ on:
     branches:
       - master
       - 'release/**'
+  release:
+    types:
+      - created
   workflow_dispatch:
     inputs:
       debug_enabled:
@@ -277,7 +280,7 @@ jobs:
     needs: build
     runs-on: ubuntu-18.04
     name: image
-    if: ${{ gitHub.event_name == 'release' }}
+    if: ${{ github.event_name == 'release' }}
     strategy:
       fail-fast: false
       matrix:
