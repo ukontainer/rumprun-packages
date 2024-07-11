@@ -22,7 +22,7 @@ build/Makefile: build/configure
 	(cd build/ && \
 		./configure --build=x86_64-unknown-netbsd \
 		--host=$(RUMPRUN_TOOLCHAIN_TUPLE) $(NETPERF_CONF_OPTS) \
-		LDFLAGS=-static;)
+		LDFLAGS=-static CFLAGS=-Wno-implicit-function-declaration;)
 
 build/configure:
 	mkdir -p build
