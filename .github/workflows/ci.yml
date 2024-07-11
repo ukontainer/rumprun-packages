@@ -113,12 +113,6 @@ jobs:
           path: src/rumprun-packages
           submodules: true
 
-      - name: Install LLVM and Clang
-        if: runner.os == 'linux' && matrix.arch == 'amd64'
-        uses: KyleMayes/install-llvm-action@v1
-        with:
-          version: "10.0"
-
       - name: Install frankenlibc
         env:
           URL: "https://github.com/ukontainer/frankenlibc/releases/download/latest/frankenlibc-${{ matrix.arch }}-${{ matrix.os_alias }}.tar.gz"
