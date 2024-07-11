@@ -47,7 +47,7 @@ jobs:
             arch: amd64
             os_alias: linux
             arch_alias: amd64
-            runs_on: ubuntu-18.04
+            runs_on: ubuntu-24.04
             cc: clang
             cxx: clang++
             rumprun_tuple: x86_64-rumprun-linux
@@ -56,7 +56,7 @@ jobs:
             arch: amd64
             os_alias: osx
             arch_alias: amd64
-            runs_on: macos-11
+            runs_on: macos-12
             cc: clang
             cxx: clang++
             rumprun_tuple: x86_64-rumprun-linux
@@ -65,7 +65,7 @@ jobs:
             arch: arm32
             os_alias: linux
             arch_alias: armhf
-            runs_on: ubuntu-18.04
+            runs_on: ubuntu-24.04
             cc: arm-linux-gnueabihf-gcc
             cxx: g++
             rumprun_tuple: arm-rumprun-linux
@@ -74,7 +74,7 @@ jobs:
             arch: arm64
             os_alias: linux
             arch_alias: arm64
-            runs_on: ubuntu-18.04
+            runs_on: ubuntu-24.04
             cc: aarch64-linux-gnu-gcc
             cxx: g++
             rumprun_tuple: aarch64-rumprun-linux
@@ -108,7 +108,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
         with:
           path: src/rumprun-packages
           submodules: true
@@ -140,7 +140,7 @@ jobs:
           echo "/usr/lib/ccache/bin:/usr/lib/ccache:/usr/local/opt/ccache/libexec:$HOME/.local/bin:/opt/rump/bin:${{ github.workspace }}/bin" >> $GITHUB_PATH
           echo "export PATH=/usr/lib/ccache/bin:/usr/lib/ccache:/usr/local/opt/ccache/libexec:$HOME/.local/bin:/opt/rump/bin:${{ github.workspace }}/bin:$PATH" >> $HOME/.bashrc
 
-      - uses: actions/cache@v2
+      - uses: actions/cache@v4
         with:
           path: ${{ env.CCACHE_DIR }}
           key: ${{ runner.os }}-${{ matrix.arch }}-${{ matrix.package }}-ccache-build-${{ github.sha }}
@@ -148,7 +148,7 @@ jobs:
 
       - name: pkg dependency
         run: |
-          pip install yamlish
+          pip install yamlish --break-system-packages
 
       - name: pkg dependency (linux)
         if: runner.os == 'linux'
@@ -169,7 +169,7 @@ jobs:
         run: |
           mkdir -p ~/.local/bin
           brew install gnu-sed ccache e2fsprogs
-          brew install binutils coreutils jq automake
+          brew install binutils coreutils automake
           ln -sf /usr/local/bin/gsed ~/.local/bin/sed
           ln -sf /usr/local/bin/gdate ~/.local/bin/date
           ln -sf /usr/local/opt/e2fsprogs/sbin/mkfs.ext4 ~/.local/bin/
@@ -181,13 +181,19 @@ jobs:
       - name: ccache counter reset
         run: ccache -z
 
+      - name: Setup tmate session
+        uses: mxschmitt/action-tmate@v3
+        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
+        with:
+          detached: true
+
       - name: build
         run: |
           make -j4 -C ${{ matrix.package }}
 
       - name: upload artifact
         if: matrix.package != 'zlib'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package_alias }}-${{ matrix.os_alias }}-${{ matrix.arch }}
           path: |
@@ -195,7 +201,7 @@ jobs:
 
       - name: upload artifact (nginx)
         if: matrix.package == 'nginx'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: data-${{ matrix.os_alias }}-${{ matrix.arch }}.iso
           path: |
@@ -203,14 +209,14 @@ jobs:
 
       - name: upload artifact (python3)
         if: matrix.package == 'python3'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python-${{ matrix.os_alias }}-${{ matrix.arch }}.iso
           path: |
             src/rumprun-packages/${{ matrix.package }}/images/python.iso
       - name: upload artifact (python3/linux)
         if: matrix.package == 'python3' && runner.os == 'linux' && matrix.arch == 'amd64'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: python-${{ matrix.os_alias }}-${{ matrix.arch }}.img
           path: |
@@ -218,7 +224,7 @@ jobs:
 
       - name: upload artifact (netperf)
         if: matrix.package == 'netperf'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: netserver-${{ matrix.os_alias }}-${{ matrix.arch }}
           path: |
@@ -226,7 +232,7 @@ jobs:
 
       - name: upload artifact (named)
         if: matrix.package == 'named' && runner.os == 'linux'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: named-${{ matrix.os_alias }}-${{ matrix.arch }}.img
           path: |
@@ -243,7 +249,7 @@ jobs:
 
       - name: upload artifact (tiny)'
         if: matrix.package != 'zlib'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: ${{ matrix.package_alias }}-${{ matrix.os_alias }}-${{ matrix.arch }}-slim
           path: |
@@ -251,7 +257,7 @@ jobs:
 
       - name: upload artifact (netperf) (tiny)
         if: matrix.package == 'netperf'
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@v4
         with:
           name: netserver-${{ matrix.os_alias }}-${{ matrix.arch }}-slim
           path: |
@@ -263,12 +269,8 @@ jobs:
         run: |
           ccache --show-stats
 
-      - name: Setup tmate session
-        uses: mxschmitt/action-tmate@v3
-        if: ${{ github.event_name == 'workflow_dispatch' && github.event.inputs.debug_enabled }}
-
       - name: Annotate
-        uses: yuzutech/annotations-action@v0.3.0
+        uses: yuzutech/annotations-action@v0.5.0
         with:
           repo-token: "${{ secrets.GITHUB_TOKEN }}"
           input: "${{env.working-directory}}/annotations.json"
@@ -276,7 +278,7 @@ jobs:
 
   docker-image:
     needs: build
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-24.04
     name: image
     if: ${{ github.event_name == 'release' }}
     strategy:
@@ -297,7 +299,7 @@ jobs:
       #registry: localhost:5050/
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - uses: actions/download-artifact@v2
         with:
           path: artifacts
@@ -426,11 +428,11 @@ jobs:
 
   trigger:
     needs: docker-image
-    runs-on: ubuntu-18.04
+    runs-on: ubuntu-24.04
     name: downstream
     if: ${{ github.event_name == 'release' }}
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
         with:
           fetch-depth: 0
       - name: Set environment variables for image name
