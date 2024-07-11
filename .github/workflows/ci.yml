@@ -41,6 +41,12 @@ jobs:
           - os: linux
             arch: arm64
             package: nodejs
+          - os: linux
+            arch: amd64
+            package: nodejs
+          - os: macos
+            arch: amd64
+            package: nodejs
         include:
           - displayTargetName: linux-amd64
             os: linux
@@ -84,8 +90,6 @@ jobs:
             package_alias: netperf
           - package: nginx
             package_alias: nginx
-          - package: nodejs
-            package_alias: node
           - package: python3
             package_alias: python
           - package: redis
