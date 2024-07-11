@@ -1,5 +1,5 @@
 include ../Makefile.inc
-UPSTREAM=https://www.zlib.net/zlib-1.2.11.tar.gz
+UPSTREAM=https://sourceforge.net/projects/libpng/files/zlib/1.2.11/zlib-1.2.11.tar.gz
 TARBALL=$(notdir $(UPSTREAM))
 
 all: build/libz.a

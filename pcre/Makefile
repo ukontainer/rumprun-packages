@@ -1,6 +1,6 @@
 include ../Makefile.inc
 #UPSTREAM=ftp://ftp.csx.cam.ac.uk/pub/software/programming/pcre/pcre-8.40.tar.gz
-UPSTREAM=https://ftp.pcre.org/pub/pcre/pcre-8.40.tar.gz
+UPSTREAM=https://sourceforge.net/projects/pcre/files/pcre/8.40/pcre-8.40.tar.gz
 TARBALL=$(notdir $(UPSTREAM))
 
 all: bin/pcre
