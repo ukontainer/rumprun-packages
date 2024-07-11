@@ -284,7 +284,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        package: [named, netperf, nginx, node, python, sqlite-bench, base]
+        package: [named, netperf, nginx, python, sqlite-bench, base]
         image_type: ["", "-slim"]
     permissions:
       contents: read
