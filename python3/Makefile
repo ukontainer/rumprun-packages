@@ -59,7 +59,10 @@ dl/$(TARBALL):
 build/hostpython: | dl/$(TARBALL)
 	mkdir -p build
 	(cd build && tar -x --strip-components 1 -f ../dl/$(TARBALL))
-	(cd build; CFLAGS=$(HOST_CFLAGS) ./configure --prefix=$(shell pwd)/build/hostdist; make python Parser/pgen && make install)
+ifeq ($(shell uname),Darwin)
+	(cd build && sed "s/^MULTIARCH=.*//" configure > /tmp/a; mv /tmp/a configure; chmod +x configure)
+endif
+	(cd build; CFLAGS=$(HOST_CFLAGS) ./configure --prefix=$(shell pwd)/build/hostdist; CFLAGS=-IInclude make python Parser/pgen && make install)
 	mv build/python$(EXESUFFIX) build/hostpython
 
 build/Parser/hostpgen: build/hostpython

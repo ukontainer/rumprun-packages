@@ -101,6 +101,8 @@ jobs:
       CC: ${{ matrix.cc }}
       CXX: ${{ matrix.cxx }}
       RUMPRUN_TOOLCHAIN_TUPLE: ${{ matrix.rumprun_tuple }}
+      C_INCLUDE_PATH: /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Headers
+      CPLUS_INCLUDE_PATH: /Library/Developer/CommandLineTools/Library/Frameworks/Python3.framework/Versions/3.9/Headers
 
     defaults:
       run:
