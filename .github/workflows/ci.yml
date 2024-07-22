@@ -53,7 +53,7 @@ jobs:
             arch: amd64
             os_alias: linux
             arch_alias: amd64
-            runs_on: ubuntu-24.04
+            runs_on: ubuntu-22.04
             cc: clang
             cxx: clang++
             rumprun_tuple: x86_64-rumprun-linux
@@ -71,7 +71,7 @@ jobs:
             arch: arm32
             os_alias: linux
             arch_alias: armhf
-            runs_on: ubuntu-24.04
+            runs_on: ubuntu-22.04
             cc: arm-linux-gnueabihf-gcc
             cxx: g++
             rumprun_tuple: arm-rumprun-linux
@@ -80,7 +80,7 @@ jobs:
             arch: arm64
             os_alias: linux
             arch_alias: arm64
-            runs_on: ubuntu-24.04
+            runs_on: ubuntu-22.04
             cc: aarch64-linux-gnu-gcc
             cxx: g++
             rumprun_tuple: aarch64-rumprun-linux
@@ -148,7 +148,7 @@ jobs:
 
       - name: pkg dependency
         run: |
-          pip install yamlish --break-system-packages
+          pip install yamlish
 
       - name: pkg dependency (linux)
         if: runner.os == 'linux'
@@ -278,7 +278,7 @@ jobs:
 
   docker-image:
     needs: build
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     name: image
     if: ${{ github.event_name == 'release' }}
     strategy:
@@ -429,7 +429,7 @@ jobs:
 
   trigger:
     needs: docker-image
-    runs-on: ubuntu-24.04
+    runs-on: ubuntu-22.04
     name: downstream
     if: ${{ github.event_name == 'release' }}
     steps:
